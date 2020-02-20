@@ -15,14 +15,9 @@
 
 //SeedDB();
 
-// mongoose.connect("mongodb://localhost:27017/camps", {
-// 	useNewUrlParser: true, 
-// 	useFindAndModify: false,
-// 	useCreateIndex: true,
-// 	useUnifiedTopology: true
-// });
+//"mongodb://localhost:27017/camps"
 
-mongoose.connect("mongodb+srv://chan:WimpyKid839%@camp-ogvo5.mongodb.net/test?retryWrites=true&w=majority", {
+mongoose.connect(process.env.DBURL, {
 	useNewUrlParser: true, 
 	useFindAndModify: false,
 	useCreateIndex: true,
