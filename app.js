@@ -15,10 +15,12 @@
 
 //SeedDB();
 
-mongoose.set('useFindAndModify', false);
-mongoose.set('useCreateIndex', true);
-mongoose.set('useUnifiedTopology', true);
-mongoose.connect("mongodb://localhost:27017/camps", {useNewUrlParser: true});
+mongoose.connect("mongodb://localhost:27017/camps", {
+	useNewUrlParser: true, 
+	useFindAndModify: false,
+	useCreateIndex: true,
+	useUnifiedTopology: true
+});
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
