@@ -1,0 +1,15 @@
+<%- include("../partials/top") %>
+<div class="my-3">
+	<h1 class="text-center">Create a New Campground</h1>
+	<div class="my-4 mx-auto">
+		<form action="/campgrounds" method="POST">
+			<input type="text" class="form-control mb-2" name="camp[name]" placeholder="name" ariadescribedby="nameOfCamp">
+			<input type="text" name="camp[image]" class="form-control mb-2" placeholder="image url">
+			<input type="text" name="camp[description]" class="form-control mb-2" placeholder="description">
+			<input type="number" name="camp[price]" class="form-control mb-2" placeholder="price" min="0.01" step="0.01">
+			<button type="submit" class="btn btn-primary btn-block mb-2">Add</button>
+		</form>
+		<a href="/campgrounds">Back to Campgrounds</a>
+	</div>
+</div>
+<%- include("../partials/bottom") %>

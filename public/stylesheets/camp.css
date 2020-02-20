@@ -1,0 +1,15 @@
+h1 + div{
+	width: 30%;
+}
+
+.border img {
+	width: 100%;
+}
+
+hr{
+	width: 100%;
+}
+
+a + form{
+	display: inline;
+}
