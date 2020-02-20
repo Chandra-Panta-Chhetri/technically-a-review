@@ -17,7 +17,7 @@
 
 //"mongodb://localhost:27017/camps"
 
-mongoose.connect(process.env.DBURL, {
+mongoose.connect("mongodb+srv://chan:WimpyKid839@cluster0-ogvo5.mongodb.net/test?retryWrites=true&w=majority", {
 	useNewUrlParser: true, 
 	useFindAndModify: false,
 	useCreateIndex: true,
