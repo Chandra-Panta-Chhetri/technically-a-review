@@ -22,7 +22,7 @@
 					<p><%= camp.description %></p>
 					<p>Created by: <%= camp.author.username %></p>
 					<p><%= moment(camp.createdDate).fromNow() %></p>
-					<% if(user && camp.author.id.equals(user._id)){ %>
+					<% if(user && (camp.author.id.equals(user._id) || user.isAdmin)){ %>
 						<a class="btn btn-xs btn-warning" href="/campgrounds/<%= camp._id %>/edit">Edit</a>
 						<form action="/campgrounds/<%= camp._id %>/?_method=DELETE" method="POST">
 							<button class="btn btn-xs btn-danger">Delete</button>
@@ -40,7 +40,7 @@
 						<span class="float-right"><%= moment(camp.createdDate).fromNow() %></span>
 					</p>
 					<p><%= comment.contents %></p>
-					<% if(user && comment.author.id.equals(user._id)) { %>
+					<% if(user && (camp.author.id.equals(user._id) || user.isAdmin)) { %>
 						<a class="btn btn-xs btn-warning" href="/campgrounds/<%= camp._id %>/comments/<%= comment._id %>/edit">Edit</a>
 						<form action="/campgrounds/<%= camp._id %>/comments/<%= comment._id %>/?_method=DELETE" method="POST">
 							<button class="btn btn-xs btn-danger">Delete</button>

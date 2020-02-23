@@ -68,8 +68,10 @@ router.put("/:id", middleware.hasCampAutherization, function(req, res){
 router.delete("/:id", middleware.hasCampAutherization, function(req, res){
 	Camp.findByIdAndRemove(req.params.id, function(err){
 		if(err){
+			req.flash("error", "Something went wrong while attempting to delete the campground");
 			res.redirect("/campgrounds/" + req.params.id);
 		}
+		req.flash("success", "Campground deleted successfully!");
 		res.redirect("/campgrounds");
 	});
 });

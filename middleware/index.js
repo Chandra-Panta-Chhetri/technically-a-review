@@ -17,7 +17,7 @@ middleware.hasCampAutherization = function(req, res, next){
 				req.flash("error", "Campground not found");
 				res.redirect("/campgrounds");
 			}
-			else if(foundCamp.author.id.equals(req.user._id)){
+			else if(foundCamp.author.id.equals(req.user._id) || req.user.isAdmin){
 				next();
 			}else{
 				req.flash("error", "You do not have permission to do that");
@@ -37,7 +37,7 @@ middleware.hasCommentAutherization = function(req, res, next){
 				req.flash("error", "Comment not found");
 				res.redirect("back");
 			}else{
-				if(foundComment.author.id.equals(req.user._id)){
+				if(foundComment.author.id.equals(req.user._id) || req.user.isAdmin){
 					next();
 				}else{
 					req.flash("error", "You do not have permission to do that");

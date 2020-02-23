@@ -59,8 +59,10 @@ router.put("/:commentId", middleware.hasCommentAutherization, function(req, res)
 router.delete("/:commentId", middleware.hasCommentAutherization, function(req, res){
 	Comment.findByIdAndRemove(req.params.commentId, function(err){
 		if(err){
+			req.flash("error", "Cannot delete the comment at this time, please try again");
 			res.redirect("/campgrounds/" + req.params.id);
 		}else{
+			req.flash("success", "Comment was successfully deleted!");
 			res.redirect("/campgrounds");
 		}
 	});
