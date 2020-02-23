@@ -1,22 +1,20 @@
 <%- include("../partials/top") %>
-<div class="container">
-	<div class="jumbotron">
-		<h1 class="display-4">Welcome to Yelp Camp!</h1>
-		<p class="lead">Enjoy our wide collection of different campgrounds</p>
-		<a class="btn btn-primary btn-lg" href="/campgrounds/new" role="button">Add New Campground</a>
-	</div>
-	<div class="row justify-content-between text-center align-items-center">
-		<% campList.forEach(function(camp){ %>
-			<div class="col-sm-4 col-md-3 mb-3 d-flex align-self-stretch">
-				<div class="card">
-					<img src="<%= camp.image %>" class="card-img-top">
-					<div class="card-body">
-						<h5 class="card-title"><%= camp.name %></h5>
-						<a class="btn btn-md btn-danger" href="/campgrounds/<%= camp._id %>">Read More</a>
-					</div>
-				</div>	
-			</div>
-		<% }); %>
-	</div>
+<div class="jumbotron mt-3">
+	<h1 class="display-4">Welcome to Yelp Camp!</h1>
+	<p class="lead">Enjoy our wide collection of different campgrounds</p>
+	<a class="btn btn-primary btn-lg" href="/campgrounds/new" role="button">Add New Campground</a>
+</div>
+<div class="row justify-content-between text-center align-items-center">
+	<% campList.forEach(function(camp){ %>
+		<div class="col-sm-4 col-md-3 mb-3 d-flex align-self-stretch">
+			<div class="card">
+				<img src="<%= camp.image %>" class="card-img-top">
+				<div class="card-body">
+					<h5 class="card-title"><%= camp.name %></h5>
+					<a class="btn btn-md btn-danger" href="/campgrounds/<%= camp._id %>">Read More</a>
+				</div>
+			</div>	
+		</div>
+	<% }); %>
 </div>
 <%- include("../partials/bottom") %>

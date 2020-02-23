@@ -4,6 +4,7 @@ var mongoose 	= require("mongoose"),
 	image: String,
 	description: String,
 	price: String,
+	createdDate: {type: Date, default: Date.now},
 	comments: [{type: mongoose.Schema.Types.ObjectId,
 			  ref: "Comment"}],
 	author: {

@@ -7,7 +7,8 @@ var mongoose 		= require("mongoose"),
 			},
 			username: String
 		},
-		contents: String
+		contents: String,
+		createdDate: {type: Date, default: Date.now}
 	});
 	
 module.exports = mongoose.model("Comment", commentSchema);

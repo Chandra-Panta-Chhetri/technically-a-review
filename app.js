@@ -40,9 +40,10 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use(function(req, res, next){
-	res.locals.user = req.user;
-	res.locals.error = req.flash("error");
-	res.locals.success = req.flash("success");
+	res.locals.user 	= req.user;
+	res.locals.error 	= req.flash("error");
+	res.locals.success  = req.flash("success");
+	res.locals.moment   = require("moment");
 	next();
 });
 
