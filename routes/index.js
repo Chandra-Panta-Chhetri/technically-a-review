@@ -10,7 +10,7 @@ router.get("/", function(req, res){
 
 //AUTHENTICATION ROUTES
 router.get("/login", function(req, res){
-	res.render("login");	
+	res.render("login", {page: 'login'});	
 });
 
 router.post("/login", passport.authenticate('local', { failureRedirect: '/login' }),
@@ -20,7 +20,7 @@ router.post("/login", passport.authenticate('local', { failureRedirect: '/login'
 });
 
 router.get("/signup", function(req, res){
-	res.render("signup");
+	res.render("signup", {page: 'signup'});
 });
 
 router.post("/signup", function(req, res){

@@ -9,7 +9,7 @@ router.get("/", function(req, res){
 		if(err){
 			req.redirect("/");
 		}else{
-			res.render("campground/campgrounds", {campList: camps});
+			res.render("campground/campgrounds", {campList: camps, page: 'campgrounds'});
 		}
 	});
 });

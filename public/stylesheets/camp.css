@@ -14,3 +14,7 @@ hr{
 a + form{
 	display: inline;
 }
+
+.active-page{
+	background: lightgray;
+}
