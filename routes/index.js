@@ -30,7 +30,7 @@ router.post("/signup", function(req, res){
 		fullName: req.body.name,
 		avatar: req.body.avatar
 	});
-	if(req.body.adminCode === "acerswifT3"){
+	if(req.body.adminCode === process.env.ADMINCODE){
 		newUser.isAdmin = true;
 	}
 	User.register(newUser, req.body.password, function(err, user){
