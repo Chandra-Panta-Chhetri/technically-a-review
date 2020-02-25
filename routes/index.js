@@ -65,7 +65,7 @@ router.get("/users/:id", function(req, res){
 					req.flash("error", "Cannot find camps associated with user");
 					res.redirect("/campgrounds");
 				}else{
-					res.render("userInfo", {campCreator: foundUser, createdCamps: camps});
+					res.render("user/userInfo", {campCreator: foundUser, createdCamps: camps});
 				}
 			});
 		}
