@@ -3,6 +3,9 @@ var mongoose 			  = require("mongoose"),
 	userSchema 			  = new mongoose.Schema({
 								username: String,
 								password: String,
+								fullName: String,
+								email: {type: String, unique: true, required: true},
+								avatar: String,
 								isAdmin: {type: Boolean, default: false}
 							});
 

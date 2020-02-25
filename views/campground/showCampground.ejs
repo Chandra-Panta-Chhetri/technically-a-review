@@ -20,7 +20,7 @@
 						</strong>
 					</h5>
 					<p><%= camp.description %></p>
-					<p>Created by: <%= camp.author.username %></p>
+					<p>Created by: <a href="/users/<%= camp.author.id %>"><%= camp.author.username %></a></p>
 					<p><%= moment(camp.createdDate).fromNow() %></p>
 					<% if(user && (camp.author.id.equals(user._id) || user.isAdmin)){ %>
 						<a class="btn btn-xs btn-warning" href="/campgrounds/<%= camp._id %>/edit">Edit</a>
