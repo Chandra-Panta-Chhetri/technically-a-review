@@ -29,3 +29,7 @@ footer{
 footer p{
 	margin: 20px 0;
 }
+
+h1 + img{
+	width: 90%;
+}
