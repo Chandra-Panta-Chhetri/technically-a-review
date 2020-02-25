@@ -72,4 +72,21 @@ router.get("/users/:id", function(req, res){
 	});
 });
 
+//PASSWORD RESET ROUTES
+router.get("/forgot", function(req, res){
+	res.render("user/forgot");
+});
+
+router.post("/forgot", function(req, res){
+	User.find({username: req.body.username, email: req.body.email}, function(err, user){
+		if(err || !user){
+			req.flash("error", "User with provided username and email does not exist");
+			res.redirect("/forgot");
+		}else{
+			req.flash("success", "To reset your password, please follow the instructions sent to " + req.body.email);
+			res.redirect("/forgot");
+		}
+	});
+});
+
 module.exports = router;

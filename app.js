@@ -15,8 +15,6 @@
 
 //SeedDB();
 
-//"mongodb://localhost:27017/camps"
-
 mongoose.connect(process.env.DBURL, {
 	useNewUrlParser: true, 
 	useFindAndModify: false,
