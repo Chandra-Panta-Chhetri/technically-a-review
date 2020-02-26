@@ -37,7 +37,7 @@
 				<% camp.comments.forEach(function(comment){ %>
 					<p>
 						<strong><%= comment.author.username %></strong>
-						<span class="float-right"><%= moment(camp.createdDate).fromNow() %></span>
+						<span class="float-right"><%= moment(comment.createdDate).fromNow() %></span>
 					</p>
 					<p><%= comment.contents %></p>
 					<% if(user && (camp.author.id.equals(user._id) || user.isAdmin)) { %>
