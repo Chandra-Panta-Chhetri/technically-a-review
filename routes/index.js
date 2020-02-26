@@ -2,7 +2,10 @@ var express 	= require("express"),
 	router 		= express.Router(),
 	Camp   		= require("../models/camp"),
 	passport    = require("passport"),
-	User		= require("../models/user");
+	User		= require("../models/user"),
+	asyncPack	= require("async"),
+	nodemailer	= require("nodemailer"),
+	crypto		= require("crypto");
 
 router.get("/", function(req, res){
 	res.render("home");
@@ -78,14 +81,109 @@ router.get("/forgot", function(req, res){
 });
 
 router.post("/forgot", function(req, res){
-	User.find({username: req.body.username, email: req.body.email}, function(err, user){
-		if(err || !user){
-			req.flash("error", "User with provided username and email does not exist");
-			res.redirect("/forgot");
-		}else{
-			req.flash("success", "To reset your password, please follow the instructions sent to " + req.body.email);
-			res.redirect("/forgot");
+	asyncPack.waterfall([
+		function(done){
+			crypto.randomBytes(20, function(err, buf){
+				var token = buf.toString('hex');
+				done(err, token);
+			});
+		},
+		function(token, done){
+		 	User.findOne({username: req.body.username, email: req.body.email}, function(err, user){
+				if(err || !user){
+					req.flash("error", "User with provided username and email does not exist");
+					return res.redirect("/forgot");
+				}
+				
+				user.resetPasswordToken = token;
+				user.resetPasswordExpires = Date.now() + 900000; //15 mins
+				user.save(function(err){
+					done(err, token, user);
+				});
+			});
+		},
+		function(token, user, done){
+			var smtpTransport = nodemailer.createTransport({
+				service: 'Gmail',
+				auth: {
+					user: 'infonodeapp@gmail.com',
+					pass: process.env.GMAILPW
+				}
+			});
+			var mailOptions = {
+				to: user.email,
+				from: 'infonodeapp@gmail.com',
+				subject: 'Yelp Camp Password Reset',
+				text: 'Please click on the link below to reset your password:\n' + 'http://' + req.headers.host + 						'/reset/' + token
+			};
+			smtpTransport.sendMail(mailOptions, function(err){
+				req.flash("success", "To reset your password, please follow the instructions sent to " + 									req.body.email);
+				done(err, 'done');
+			});
+		},
+	], function(err){
+		if(err){
+			return next(err);
 		}
+		res.redirect("/forgot");
+	});	
+});
+
+router.get("/reset/:token", function(req, res){
+	User.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now()}}, function(err, user){
+		 if(!user){
+			 req.flash("error", "Password Reset Token has expired or is invalid");
+			 return res.redirect("/forgot");
+		 }
+		res.render('user/reset', {token: req.params.token});
+	});
+});
+
+router.post("/reset/:token", function(req, res){
+	asyncPack.waterfall([
+		function(done){
+			User.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now()}}, function(err, user){
+			 if(!user){
+				 req.flash("error", "Password Reset Token has expired or is invalid");
+				 return res.redirect("/forgot");
+			 }
+			 if(req.body.password === req.body.confirm){
+				 user.setPassword(req.body.password, function(err){
+					user.resetPasswordToken = undefined;
+					user.resetPasswordExpires = undefined;
+					user.save(function(err){
+						req.logIn(user, function(err){
+							done(err, user);
+						});
+					});
+				 });
+			 }else{
+				 req.flash("error", "Passwords did not match");
+				 res.redirect("back");
+			 }
+			});
+		}, 
+		function(user, done){
+			var smtpTransport = nodemailer.createTransport({
+				service: 'Gmail',
+				auth: {
+					user: 'infonodeapp@gmail.com',
+					pass: process.env.GMAILPW
+				}
+			});
+			var mailOptions = {
+				to: user.email,
+				from: 'infonodeapp@gmail.com',
+				subject: 'Yelp Camp Password Reset',
+				text: 'This is a confirmation email that your password has been successfully changed'
+			};
+			smtpTransport.sendMail(mailOptions, function(err){
+				req.flash("success", "Your Password has been changed successfully");
+				done(err);
+			});
+		}
+	], function(err){
+		res.redirect("/campgrounds");
 	});
 });
 
