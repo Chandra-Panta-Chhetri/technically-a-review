@@ -1,13 +1,17 @@
 <%- include("../partials/top") %>
 <div class="my-3">
 	<h1 class="text-center">Forgot Password</h1>
-	<div class="my-4 mx-auto">
-		<form action="/forgot" method="POST">
-			<input type="text" name="username" class="form-control mb-2" placeholder="forgotten account username">
-			<input type="email" name="email" class="form-control mb-2" placeholder="forgotten account email">
-			<button class="btn btn-primary btn-block mb-2">Reset Password</button>
+	<div class="my-4">
+			<form action="/forgot" method="POST">
+			<div class="form-group row justify-content-center">
+				<div class="col-12 col-md-6 col-lg-5">
+					<input type="text" name="username" class="form-control mb-2" placeholder="forgotten account username">
+					<input type="email" name="email" class="form-control mb-2" placeholder="forgotten account email">
+					<button class="btn btn-primary btn-block mb-2">Reset Password</button>
+					<a href="/campgrounds">Go Back</a>
+				</div>
+			</div>
 		</form>
-		<a href="/campgrounds">Go Back</a>
 	</div>
 </div>
 <%- include("../partials/bottom") %>
