@@ -3,15 +3,31 @@ var express 	= require("express"),
 	Camp   		= require("../models/camp"),
 	middleware  = require("../middleware/index");
 
+
+function escapeRegex(text) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+};
+
 //INDEX
 router.get("/", function(req, res){
-	Camp.find({}, function(err, camps){
-		if(err){
-			req.redirect("/");
-		}else{
-			res.render("campground/campgrounds", {campList: camps, page: 'campgrounds'});
-		}
-	});
+	if(req.query.search){
+		const regex = new RegExp(escapeRegex(req.query.search), 'gi');
+		Camp.find({$or: [{name: regex,}, {"author.username":regex}]}, function(err, camps){
+			if(err){
+				req.redirect("/");
+			}else{
+				res.render("campground/campgrounds", {campList: camps, page: 'campgrounds'});
+			}
+		});
+	}else{
+		Camp.find({}, function(err, camps){
+			if(err){
+				req.redirect("/");
+			}else{
+				res.render("campground/campgrounds", {campList: camps, page: 'campgrounds'});
+			}
+		});	
+	}
 });
 
 //NEW
