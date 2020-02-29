@@ -2,6 +2,7 @@
 	 app 						= express(),
 	 bodyParser 				= require("body-parser"),
 	 mongoose 					= require("mongoose"),
+	 //SeedDB 					= require("./seed"),
 	 User						= require("./models/user"),
 	 LocalStrategy 				= require("passport-local"),
  	 passport 					= require("passport"),
@@ -11,6 +12,8 @@
 	 campgroungRoutes			= require("./routes/campground"),
 	 methodOverride				= require("method-override"),
 	 flash						= require("connect-flash");
+
+//SeedDB();
 
 require("dotenv").config();
 mongoose.connect(process.env.DBURL, {

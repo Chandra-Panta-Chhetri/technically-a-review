@@ -1,7 +1,7 @@
 var mongoose = require("mongoose"),
 	Comment	 = require("./models/comment"),
 	Camp 	 = require("./models/camp"),
-	data 	 = [
+	camps 	 = [
 		{
 			image: "https://images.unsplash.com/photo-1537565266759-34bbc16be345?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60",
 			name: "Camp Fire",
@@ -28,21 +28,15 @@ var mongoose = require("mongoose"),
 		}
 	];
 
-function seed(){
-	Comment.deleteMany({}, function(err){
-		Camp.deleteMany({}, function(err){
-		Comment.deleteMany({}, function(err){
-			data.forEach(function(seed){
-				Camp.create(seed, function(err, camp){
-					Comment.create({author: "Jimmy Corea", contents: "blah blah blah"}, function(err, comment){
-						camp.comments.push(comment);
-						camp.save();
-					});
-				});
-			});
-		});
-	});
-	});
+async function seed(){
+	await Comment.deleteMany({});
+	await Camp.deleteMany({});
+	for(camp of camps){
+		let newCamp = await Camp.create(camp);
+		let newComment = await Comment.create({author: "Jimmy Corea", contents: "blah blah blah"});
+		newCamp.comments.push(newComment);
+		newCamp.save();
+	}
 }
 
 module.exports = seed;
