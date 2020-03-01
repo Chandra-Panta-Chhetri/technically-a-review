@@ -12,11 +12,11 @@ function escapeRegex(text) {
 router.get("/", function(req, res){
 	if(req.query.search){
 		const regex = new RegExp(escapeRegex(req.query.search), 'gi');
-		Camp.find({$or: [{name: regex,}, {"author.username":regex}]}, function(err, camps){
+		Camp.find({$or: [{name: regex}, {"author.username":regex}]}, function(err, camps){
 			if(err){
 				req.redirect("/");
 			}else{
-				res.render("campground/campgrounds", {campList: camps, page: 'campgrounds'});
+				res.render("campground/campgrounds", {campList: camps, page: 'campgrounds', searched: true});
 			}
 		});
 	}else{
@@ -24,7 +24,7 @@ router.get("/", function(req, res){
 			if(err){
 				req.redirect("/");
 			}else{
-				res.render("campground/campgrounds", {campList: camps, page: 'campgrounds'});
+				res.render("campground/campgrounds", {campList: camps, page: 'campgrounds', searched: false});
 			}
 		});	
 	}
