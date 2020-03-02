@@ -15,10 +15,6 @@
 
 //SeedDB();
 
-<<<<<<< HEAD
-=======
-require("dotenv").config();
->>>>>>> UAT
 mongoose.connect(process.env.DBURL, {
 	useNewUrlParser: true, 
 	useFindAndModify: false,
