@@ -1,0 +1,16 @@
+<%- include("../partials/top") %>
+<div class="my-3">
+	<h1 class="text-center">Reset Password</h1>
+	<div class="my-4">
+			<form action="/reset/<%= token %>" method="POST">
+			<div class="form-group row justify-content-center">
+				<div class="col-12 col-md-6 col-lg-5">
+					<input type="password" name="password" class="form-control mb-2" placeholder="new password">
+					<input type="password" name="confirm" class="form-control mb-2" placeholder="confirm password">
+					<button class="btn btn-primary btn-block mb-2">Change Password</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<%- include("../partials/bottom") %>

@@ -1,0 +1,18 @@
+<%- include("../partials/top") %>
+<div class="my-3">
+	<h1 class="text-center">Login</h1>
+	<div class="my-4">
+			<form action="/login" method="POST">
+			<div class="form-group row justify-content-center">
+				<div class="col-12 col-md-6 col-lg-5">
+					<input type="text" name="username" class="form-control mb-2" placeholder="username">
+					<input type="password" name="password" class="form-control mb-2" placeholder="password">
+					<button class="btn btn-primary btn-block mb-2">Login</button>
+					<a href="/campgrounds">Go Back</a>
+					<a href="/forgot" class="float-right">Forgot Password ?</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<%- include("../partials/bottom") %>
