@@ -2,6 +2,16 @@
 	width: 100%;
 }
 
+body{
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+}
+
+nav + div{
+	flex-grow: 1;
+}
+
 hr{
 	width: 100%;
 	display: flex;
@@ -17,7 +27,6 @@ a + form{
 
 footer{
 	background: #f8f9fa;
-	position: absolute;
 	width: 100%;
 	height: 60px;
 }
