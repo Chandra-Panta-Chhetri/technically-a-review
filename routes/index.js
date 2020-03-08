@@ -110,11 +110,12 @@ router.post("/forgot", function(req, res){
 					pass: process.env.GMAILPW
 				}
 			});
+			var mailContent = "You or someone requested a password change for the user with username: " + user.username + ".\nPlease click on the link below to reset your password:\n" + 'http://' + req.headers.host + '/reset/' + token
 			var mailOptions = {
 				to: user.email,
 				from: 'infonodeapp@gmail.com',
 				subject: 'Yelp Camp Password Reset',
-				text: 'Please click on the link below to reset your password:\n' + 'http://' + req.headers.host + 						'/reset/' + token
+				text: mailContent
 			};
 			smtpTransport.sendMail(mailOptions, function(err){
 				req.flash("success", "To reset your password, please follow the instructions sent to " + 									req.body.email);
@@ -175,7 +176,7 @@ router.post("/reset/:token", function(req, res){
 				to: user.email,
 				from: 'infonodeapp@gmail.com',
 				subject: 'Yelp Camp Password Reset',
-				text: 'This is a confirmation email that your password has been successfully changed'
+				text: 'This is a confirmation email to inform you that your password has been successfully changed!'
 			};
 			smtpTransport.sendMail(mailOptions, function(err){
 				req.flash("success", "Your Password has been changed successfully");
