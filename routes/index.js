@@ -110,7 +110,7 @@ router.post("/forgot", function(req, res){
 					pass: process.env.GMAILPW
 				}
 			});
-			var mailContent = "You or someone requested a password change for the user with username: " + user.username + ".\nPlease click on the link below to reset your password:\n" + 'http://' + req.headers.host + '/reset/' + token
+			var mailContent = "You or someone requested a password change for the user with username: " + user.username + ".\nPlease click on the link below to reset your password:\n" + 'http://' + req.headers.host + '/reset/' + token + "\nNote: This link will expire in 15 mins.";
 			var mailOptions = {
 				to: user.email,
 				from: 'infonodeapp@gmail.com',
