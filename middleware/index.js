@@ -1,6 +1,7 @@
 var middleware = {},
 	Camp 	   = require("../models/camp"),
-	Comment    = require("../models/comment");
+	Comment    = require("../models/comment"),
+	User	   = require("../models/user");
 
 middleware.isLoggedIn = function(req, res, next){
 	if(req.isAuthenticated()){
@@ -44,6 +45,25 @@ middleware.hasCommentAutherization = function(req, res, next){
 					res.redirect("back");
 				}
 			}
+		});
+	}else{
+		req.flash("error", "You need to be logged in to do that");
+		res.redirect("/login");
+	}
+}
+
+middleware.hasProfileEditAuth = function(req, res, next){
+	if(req.isAuthenticated()){
+		User.findById(req.params.id, function(err, foundUser){
+			if(err || !foundUser){
+				req.flash("error", "User with provided id not found");
+				return res.redirect("back");
+			}
+			if(foundUser._id.equals(req.user._id)){
+				return next();
+			}
+			req.flash("error", "Only the account holder may edit their profile");
+			res.redirect("/users/" + req.params.id);
 		});
 	}else{
 		req.flash("error", "You need to be logged in to do that");

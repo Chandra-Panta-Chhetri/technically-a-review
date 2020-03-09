@@ -5,7 +5,8 @@ var express 	= require("express"),
 	User		= require("../models/user"),
 	asyncPack	= require("async"),
 	nodemailer	= require("nodemailer"),
-	crypto		= require("crypto");
+	crypto		= require("crypto"),
+	middleware  = require("../middleware/index");
 
 router.get("/", function(req, res){
 	res.render("home");
@@ -56,7 +57,6 @@ router.get("/logout", function(req, res){
 });
 
 //USER ROUTES
-
 router.get("/users/:id", function(req, res){
 	User.findById(req.params.id, function(err, foundUser){
 		if(err){
@@ -72,6 +72,35 @@ router.get("/users/:id", function(req, res){
 				}
 			});
 		}
+	});
+});
+
+//EDIT
+router.get("/users/:id/edit", middleware.hasProfileEditAuth, function(req, res) {
+	User.findOne({_id: req.params.id}, function(err, user){
+		if(err || !user){
+			req.flash("error", "Cannot find user with provided id");
+			return res.redirect("back");
+		}
+		res.render("user/editProfile", {foundUser: user});
+	});
+});
+
+
+//UPDATE
+router.put("/users/:id", middleware.hasProfileEditAuth, function(req, res){
+	User.findOneAndUpdate({_id: req.params.id}, {$set: 
+		{
+			fullName: req.body.name, 
+			email: req.body.email, 
+			avatar: req.body.avatar
+		}}, function(err, user){
+			if(err){
+				req.flash("error", "Cannot update user info at this time. Please try again later.");
+				return res.redirect("/user/" + req.params.id);
+			}
+			req.flash("success", "User info successfully updated!");
+			res.redirect("/users/" + req.params.id);
 	});
 });
 

@@ -13,6 +13,9 @@
 	<div class="col-7 text-center">
 		<h1><%= campCreator.fullName %></h1>
 		<img src="<%= campCreator.avatar %>">
+		<% if(user && user._id.equals(campCreator._id)) { %>
+			<a href="/users/<%= campCreator._id %>/edit" class="mt-2 btn btn-warning">Edit Profile</a>
+		<% } %>
 	</div>
 </div>
 
