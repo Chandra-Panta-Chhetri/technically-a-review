@@ -17,11 +17,15 @@
 		<div class="row justify-content-between text-center align-items-center">	 
 	<% } %>
 	<% campList.forEach(function(camp){ %>
-		<div class="col-sm-4 col-md-3 mb-3 d-flex align-self-stretch">
+		<div class="col-sm-6 col-md-5 col-lg-4 mb-3 d-flex align-self-stretch">
 			<div class="card">
 				<img src="<%= camp.image %>" class="card-img-top">
 				<div class="card-body">
 					<h5 class="card-title"><%= camp.name %></h5>
+					<div class="mb-3">
+						<span><%= camp.comments.length %></span>
+						<i class="fas fa-comments ml-1"></i>
+					</div>
 					<a class="btn btn-md btn-danger" href="/campgrounds/<%= camp._id %>">Read More</a>
 				</div>
 			</div>	

@@ -38,3 +38,13 @@ footer p{
 h1 + img{
 	width: 90%;
 }
+
+.card-body i{
+	color: gray;
+	font-size: 30px;
+}
+
+.card-body span{
+	font-size: 25px;
+	font-weight: bold;
+}
