@@ -17,7 +17,7 @@ router.get("/login", function(req, res){
 	res.render("user/login", {page: 'login'});	
 });
 
-router.post("/login", passport.authenticate('local', { failureRedirect: '/login' }),
+router.post("/login", passport.authenticate('local', { failureRedirect: '/login', failureFlash: "Incorrect username or password" }),
   function(req, res){
 	req.flash("success", "Welcome to Yelp Camp " + req.user.username);
 	res.redirect("/campgrounds");
@@ -59,7 +59,7 @@ router.get("/logout", function(req, res){
 //USER ROUTES
 router.get("/users/:id", function(req, res){
 	User.findById(req.params.id, function(err, foundUser){
-		if(err){
+		if(err || !foundUser){
 			req.flash("error", "User not found");
 			res.redirect("back");
 		}else{
@@ -214,6 +214,31 @@ router.post("/reset/:token", function(req, res){
 		}
 	], function(err){
 		res.redirect("/campgrounds");
+	});
+});
+
+router.get("/users/:id/changePassword", middleware.hasProfileEditAuth, (req, res) => {
+	res.render("user/changePassword", {userId: req.params.id});
+});
+
+router.post("/users/:id/changePassword", middleware.hasProfileEditAuth, (req, res) => {
+	User.findById(req.params.id, (err, user) => {
+		if(err || !user){
+			req.flash("error", "User not found");
+			return res.redirect("/campgrounds");
+		}
+		if(req.body.newPass === req.body.confirmNewPass){
+			return user.changePassword(req.body.currentPass, req.body.newPass, (err) => {
+				if(err){
+					req.flash("error", "Current password is wrong");
+					return res.redirect("/users/" + req.params.id + "/changePassword");
+				}
+				req.flash("success", "Password has been succesfully changed");
+				res.redirect("/users/" + req.params.id);
+			});
+		}
+		req.flash("error", "Please make sure passwords match");
+		res.redirect("/users/" + req.params.id + "/changePassword");
 	});
 });
 

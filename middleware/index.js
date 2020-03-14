@@ -62,7 +62,7 @@ middleware.hasProfileEditAuth = function(req, res, next){
 			if(foundUser._id.equals(req.user._id)){
 				return next();
 			}
-			req.flash("error", "Only the account holder may edit their profile");
+			req.flash("error", "Only the account holder may edit their profile or change their password");
 			res.redirect("/users/" + req.params.id);
 		});
 	}else{
