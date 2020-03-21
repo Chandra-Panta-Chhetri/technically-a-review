@@ -1,6 +1,6 @@
-<%- include("../partials/top") %>
+<%- include("../partials/header") %>
 <div class="my-3">
-	<h1 class="text-center">Create a New Campground</h1>
+	<h1 class="text-center">Edit Campground</h1>
 	<div class="my-4">
 			<form action="/campgrounds/<%= camp._id %>/?_method=PUT" method="POST">
 			<div class="form-group row justify-content-center">
@@ -16,4 +16,4 @@
 		</form>
 	</div>
 </div>
-<%- include("../partials/bottom") %>
+<%- include("../partials/footer") %>

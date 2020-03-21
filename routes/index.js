@@ -1,137 +1,70 @@
-var express 	= require("express"),
-	router 		= express.Router(),
-	Camp   		= require("../models/camp"),
-	passport    = require("passport"),
-	User		= require("../models/user"),
-	asyncPack	= require("async"),
-	nodemailer	= require("nodemailer"),
-	crypto		= require("crypto"),
-	middleware  = require("../middleware/index");
+const express 	 = require("express"),
+	  router     = express.Router(),
+	  passport   = require("passport"),
+	  User		 = require("../models/user"),
+	  asyncPack	 = require("async"),
+	  nodemailer = require("nodemailer"),
+	  crypto	 = require("crypto");
 
-router.get("/", function(req, res){
-	res.render("home");
+router.get("/", (req, res) => res.render("home"));
+
+router.get("/login", (req, res) => res.render("user/login", {page: 'login'}));
+
+router.post("/login", passport.authenticate('local', { failureRedirect: '/login', failureFlash: "Incorrect username or password."}),
+  (req, res) => {
+	req.flash("success", "Welcome to Yelp Camp, " + req.user.username + "!");
+	return res.redirect("/campgrounds");
 });
 
-//AUTHENTICATION ROUTES
-router.get("/login", function(req, res){
-	res.render("user/login", {page: 'login'});	
-});
+router.get("/signup", (req, res) => res.render("user/signup", {page: 'signup'}));
 
-router.post("/login", passport.authenticate('local', { failureRedirect: '/login', failureFlash: "Incorrect username or password" }),
-  function(req, res){
-	req.flash("success", "Welcome to Yelp Camp " + req.user.username);
-	res.redirect("/campgrounds");
-});
-
-router.get("/signup", function(req, res){
-	res.render("user/signup", {page: 'signup'});
-});
-
-router.post("/signup", function(req, res){
-	var newUser = new User({
-		username: req.body.username, 
-		email: req.body.email,
-		fullName: req.body.name,
-		avatar: req.body.avatar
-	});
-	if(req.body.adminCode === process.env.ADMINCODE){
-		newUser.isAdmin = true;
+router.post("/signup", async (req, res) => {
+	try {
+		const userPassword = req.body.newUser.password;
+		req.body.newUser.isAdmin = req.body.newUser.code === process.env.ADMINCODE;
+		delete req.body.newUser.code;
+		delete req.body.newUser.password;
+		const user = await User.register(req.body.newUser, userPassword);
+		req.logIn(user, (err) => {
+			req.flash("success", "Welcome to Yelp Camp " + user.username);
+			return res.redirect("/campgrounds");
+		});
+	} catch (e) {
+		req.flash("error", e.message);
+		return res.redirect("/signup");
 	}
-	User.register(newUser, req.body.password, function(err, user){
-		if(err){
-			req.flash("error", err.message);
-			res.redirect("/signup")
-		}else{
-			passport.authenticate("local")(req, res, function(){
-				req.flash("success", "Welcome to Yelp Camp " + user.username);
-				res.redirect("/campgrounds");
-			});
-		}
-	});
 });
 
-router.get("/logout", function(req, res){
+router.get("/logout", (req, res) => {
 	req.logout();
-	req.flash("success", "Logged you out")
-	res.redirect("/campgrounds");
+	req.flash("success", "Successfully logged out!");
+	return res.redirect("/campgrounds");
 });
 
-//USER ROUTES
-router.get("/users/:id", function(req, res){
-	User.findById(req.params.id, function(err, foundUser){
-		if(err || !foundUser){
-			req.flash("error", "User not found");
-			res.redirect("back");
-		}else{
-			Camp.find({"author.id": foundUser._id}, function(err, camps){
-				if(err){
-					req.flash("error", "Cannot find camps associated with user");
-					res.redirect("/campgrounds");
-				}else{
-					res.render("user/userInfo", {campCreator: foundUser, createdCamps: camps});
-				}
-			});
-		}
-	});
-});
+router.get("/forgot", (req, res) => res.render("user/forgot"));
 
-//EDIT
-router.get("/users/:id/edit", middleware.hasProfileEditAuth, function(req, res) {
-	User.findOne({_id: req.params.id}, function(err, user){
-		if(err || !user){
-			req.flash("error", "Cannot find user with provided id");
-			return res.redirect("back");
-		}
-		res.render("user/editProfile", {foundUser: user});
-	});
-});
-
-
-//UPDATE
-router.put("/users/:id", middleware.hasProfileEditAuth, function(req, res){
-	User.findOneAndUpdate({_id: req.params.id}, {$set: 
-		{
-			fullName: req.body.name, 
-			email: req.body.email, 
-			avatar: req.body.avatar
-		}}, function(err, user){
-			if(err){
-				req.flash("error", "Cannot update user info at this time. Please try again later.");
-				return res.redirect("/user/" + req.params.id);
-			}
-			req.flash("success", "User info successfully updated!");
-			res.redirect("/users/" + req.params.id);
-	});
-});
-
-//PASSWORD RESET ROUTES
-router.get("/forgot", function(req, res){
-	res.render("user/forgot");
-});
-
-router.post("/forgot", function(req, res){
+router.post("/forgot", (req, res) => {
 	asyncPack.waterfall([
-		function(done){
-			crypto.randomBytes(20, function(err, buf){
+		(done) => {
+			crypto.randomBytes(20, (err, buf) => {
 				var token = buf.toString('hex');
 				done(err, token);
 			});
 		},
-		function(token, done){
-		 	User.findOne({username: req.body.username, email: req.body.email}, function(err, user){
+		(token, done) => {
+		 	User.findOne({username: req.body.username, email: req.body.email}, (err, user) => {
 				if(err || !user){
-					req.flash("error", "User with provided username and email does not exist");
+					req.flash("error", "User with provided username or email does not exist.");
 					return res.redirect("/forgot");
 				}
-				
 				user.resetPasswordToken = token;
 				user.resetPasswordExpires = Date.now() + 900000; //15 mins
-				user.save(function(err){
+				user.save((err) => {
 					done(err, token, user);
 				});
 			});
 		},
-		function(token, user, done){
+		(token, user, done) => {
 			var smtpTransport = nodemailer.createTransport({
 				service: 'Gmail',
 				auth: {
@@ -146,43 +79,38 @@ router.post("/forgot", function(req, res){
 				subject: 'Yelp Camp Password Reset',
 				text: mailContent
 			};
-			smtpTransport.sendMail(mailOptions, function(err){
-				req.flash("success", "To reset your password, please follow the instructions sent to " + 									req.body.email);
+			smtpTransport.sendMail(mailOptions, (err) => {
+				req.flash("success", "To reset your password, please follow the instructions sent to " + req.body.email);
 				done(err, 'done');
 			});
 		},
-	], function(err){
-		if(err){
-			return next(err);
-		}
-		res.redirect("/forgot");
-	});	
+	], (err) => res.redirect("/forgot"));	
 });
 
-router.get("/reset/:token", function(req, res){
-	User.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now()}}, function(err, user){
-		 if(!user){
-			 req.flash("error", "Password Reset Token has expired or is invalid");
-			 return res.redirect("/forgot");
-		 }
-		res.render('user/reset', {token: req.params.token});
-	});
+router.get("/reset/:token", async (req, res) => {
+	try {
+		await User.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now()}});
+		return res.render('user/reset', {token: req.params.token});
+	} catch (e) {
+		req.flash("error", "Password reset token has expired or is invalid.");
+		return res.redirect("/forgot");
+	}
 });
 
-router.post("/reset/:token", function(req, res){
+router.post("/reset/:token", (req, res) => {
 	asyncPack.waterfall([
-		function(done){
-			User.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now()}}, function(err, user){
-			 if(!user){
-				 req.flash("error", "Password Reset Token has expired or is invalid");
+		(done) => {
+			User.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: {$gt: Date.now()}}, (err, user) => {
+			 if(!user || err){
+				 req.flash("error", "Password Reset Token has expired or is invalid.");
 				 return res.redirect("/forgot");
 			 }
 			 if(req.body.password === req.body.confirm){
-				 user.setPassword(req.body.password, function(err){
+				 user.setPassword(req.body.password, (err) => {
 					user.resetPasswordToken = undefined;
 					user.resetPasswordExpires = undefined;
-					user.save(function(err){
-						req.logIn(user, function(err){
+					user.save((err) => {
+						req.logIn(user, (err) =>{
 							done(err, user);
 						});
 					});
@@ -193,7 +121,7 @@ router.post("/reset/:token", function(req, res){
 			 }
 			});
 		}, 
-		function(user, done){
+		(user, done) => {
 			var smtpTransport = nodemailer.createTransport({
 				service: 'Gmail',
 				auth: {
@@ -212,34 +140,7 @@ router.post("/reset/:token", function(req, res){
 				done(err);
 			});
 		}
-	], function(err){
-		res.redirect("/campgrounds");
-	});
-});
-
-router.get("/users/:id/changePassword", middleware.hasProfileEditAuth, (req, res) => {
-	res.render("user/changePassword", {userId: req.params.id});
-});
-
-router.post("/users/:id/changePassword", middleware.hasProfileEditAuth, (req, res) => {
-	User.findById(req.params.id, (err, user) => {
-		if(err || !user){
-			req.flash("error", "User not found");
-			return res.redirect("/campgrounds");
-		}
-		if(req.body.newPass === req.body.confirmNewPass){
-			return user.changePassword(req.body.currentPass, req.body.newPass, (err) => {
-				if(err){
-					req.flash("error", "Current password is wrong");
-					return res.redirect("/users/" + req.params.id + "/changePassword");
-				}
-				req.flash("success", "Password has been succesfully changed");
-				res.redirect("/users/" + req.params.id);
-			});
-		}
-		req.flash("error", "Please make sure passwords match");
-		res.redirect("/users/" + req.params.id + "/changePassword");
-	});
+	], (err) => res.redirect("/campgrounds"));
 });
 
 module.exports = router;

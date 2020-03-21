@@ -1,4 +1,4 @@
-var mongoose = require("mongoose"),
+const mongoose = require("mongoose"),
 	Comment	 = require("./models/comment"),
 	Camp 	 = require("./models/camp"),
 	camps 	 = [
@@ -28,12 +28,12 @@ var mongoose = require("mongoose"),
 		}
 	];
 
-async function seed(){
+const seed = async () => {
 	await Comment.deleteMany({});
 	await Camp.deleteMany({});
 	for(camp of camps){
 		let newCamp = await Camp.create(camp);
-		let newComment = await Comment.create({author: "Jimmy Corea", contents: "blah blah blah"});
+		let newComment = await Comment.create({author: "Jimmy Corea", content: "blah blah blah"});
 		newCamp.comments.push(newComment);
 		newCamp.save();
 	}

@@ -1,16 +1,16 @@
-<%- include("../partials/top") %>
+<%- include("../partials/header") %>
 <div class="my-3">
 	<h1 class="text-center">Sign Up</h1>
 	<div class="my-4">
 			<form action="/signup" method="POST">
 			<div class="form-group row justify-content-center">
 				<div class="col-12 col-md-6 col-lg-5">
-					<input type="text" name="username" class="form-control mb-2" placeholder="username">
-					<input type="password" name="password" class="form-control mb-2" placeholder="password">
-					<input type="text" name="name" class="form-control mb-2" placeholder="full name">
-					<input type="email" name="email" class="form-control mb-2" placeholder="email">
-					<input type="text" name="avatar" class="form-control mb-2" placeholder="avatar url">
-					<input type="password" name="adminCode" class="form-control mb-2" placeholder="Admin Code">
+					<input type="text" name="newUser[username]" class="form-control mb-2" placeholder="username" required>
+					<input type="password" name="newUser[password]" class="form-control mb-2" placeholder="password" required>
+					<input type="text" name="newUser[fullName]" class="form-control mb-2" placeholder="full name" required>
+					<input type="email" name="newUser[email]" class="form-control mb-2" placeholder="email" required>
+					<input type="text" name="newUser[avatar]" class="form-control mb-2" placeholder="avatar url" required>
+					<input type="password" name="newUser[code]" class="form-control mb-2" placeholder="Admin Code">
 					<button class="btn btn-primary btn-block mb-2">Sign Up!</button>
 					<a href="/campgrounds">Go Back</a>
 				</div>
@@ -18,4 +18,4 @@
 		</form>
 	</div>
 </div>
-<%- include("../partials/bottom") %>
+<%- include("../partials/footer") %>

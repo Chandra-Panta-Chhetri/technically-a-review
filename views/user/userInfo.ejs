@@ -1,11 +1,14 @@
-<%- include("../partials/top") %>
-<div class="row">
-	<div class="col-5 pt-5">
+<%- include("../partials/header") %>
+<div class="row pt-5">
+	<div class="col-5">
 		<h3>Created Campgrounds:</h3>
+		<% if(usersCamps.length == 0) { %>
+			<p>No camps created yet.</p>
+		<% } %>
 		<ul>
-			<% createdCamps.forEach(function(camp){ %>
+			<% usersCamps.forEach(function(camp){ %>
 				<li>
-					<a href="/campgrounds/<%= camp._id %>"><%= camp.name %></a> - Created <%= moment(camp.createdDate).fromNow() %>
+					<a href="/campgrounds/<%= camp._id %>"><%= camp.name %></a> - Created <%= moment(camp.createdAt).fromNow() %>
 				</li>
 			<% });%>
 		</ul>
@@ -13,11 +16,11 @@
 	<div class="col-7 text-center">
 		<h1><%= campCreator.fullName %></h1>
 		<img src="<%= campCreator.avatar %>">
-		<% if(user && user._id.equals(campCreator._id)) { %>
+		<% if(currentUser && currentUser._id.equals(campCreator._id)) { %>
 			<a href="/users/<%= campCreator._id %>/edit" class="mt-2 btn btn-warning">Edit Profile</a>
 			<a href="/users/<%= campCreator._id %>/changePassword" class="mt-2 btn btn-danger">Change Password</a>
 		<% } %>
 	</div>
 </div>
 
-<%- include("../partials/bottom") %>
+<%- include("../partials/footer") %>

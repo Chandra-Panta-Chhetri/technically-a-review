@@ -1,9 +1,9 @@
-var middleware = {},
-	Camp 	   = require("../models/camp"),
-	Comment    = require("../models/comment"),
-	User	   = require("../models/user");
+const middleware = {},
+	  Camp 	     = require("../models/camp"),
+	  Comment    = require("../models/comment"),
+	  User	     = require("../models/user");
 
-middleware.isLoggedIn = function(req, res, next){
+middleware.isLoggedIn = (req, res, next) => {
 	if(req.isAuthenticated()){
 		return next();
 	}
@@ -11,64 +11,64 @@ middleware.isLoggedIn = function(req, res, next){
 	res.redirect("/login");
 }
 
-middleware.hasCampAutherization = function(req, res, next){
+middleware.hasCampAuth = async (req, res, next) => {
 	if(req.isAuthenticated()){
-		Camp.findById(req.params.id, function(err, foundCamp){
-			if(err || !foundCamp){
-				req.flash("error", "Campground not found");
-				res.redirect("/campgrounds");
+		try {
+			const camp = await Camp.findById(req.params.id);
+			if(!camp){
+				throw new Error();
+			}else if(camp.author.id.equals(req.user._id) || req.user.isAdmin){
+				return next();
 			}
-			else if(foundCamp.author.id.equals(req.user._id) || req.user.isAdmin){
-				next();
-			}else{
-				req.flash("error", "You do not have permission to do that");
-				res.redirect("/campgrounds/" + req.params.id);
-			}
-		});
-	} else{
-		req.flash("error", "You need to be logged in to do that");
-		res.redirect("/login");
+			req.flash("error", "You do not have permission to do that");
+			return res.redirect("/campgrounds/" + req.params.id);
+		} catch (e) {
+			req.flash("error", "Campground not found");
+			return res.redirect("/campgrounds");
+		}
 	}
+	req.flash("error", "You need to be logged in to do that");
+	res.redirect("/login");
 }
 
-middleware.hasCommentAutherization = function(req, res, next){
+middleware.hasCommentAuth = async (req, res, next) =>{
 	if(req.isAuthenticated()){
-		Comment.findById(req.params.commentId, function(err, foundComment){
-			if(err || !foundComment){
-				req.flash("error", "Comment not found");
-				res.redirect("back");
-			}else{
-				if(foundComment.author.id.equals(req.user._id) || req.user.isAdmin){
-					next();
-				}else{
-					req.flash("error", "You do not have permission to do that");
-					res.redirect("back");
-				}
+		try {
+			const comment = await Comment.findById(req.params.commentId);
+			if(!comment){
+				throw new Error();
+			}else if(comment.author.id.equals(req.user._id) || req.user.isAdmin){
+				return next();
 			}
-		});
-	}else{
-		req.flash("error", "You need to be logged in to do that");
-		res.redirect("/login");
+			req.flash("error", "You do not have permission to do that");
+			return res.redirect("back");
+		} catch (e) {
+			req.flash("error", "Comment not found");
+			return res.redirect("back");
+		}
 	}
+	req.flash("error", "You need to be logged in to do that");
+	res.redirect("/login");
 }
 
-middleware.hasProfileEditAuth = function(req, res, next){
+middleware.hasProfileAuth = async (req, res, next) => {
 	if(req.isAuthenticated()){
-		User.findById(req.params.id, function(err, foundUser){
-			if(err || !foundUser){
-				req.flash("error", "User with provided id not found");
-				return res.redirect("back");
-			}
-			if(foundUser._id.equals(req.user._id)){
+		try {
+			const user = await User.findById(req.params.id);
+			if(!user){
+				throw new Error();
+			}else if(user._id.equals(req.user._id)){
 				return next();
 			}
 			req.flash("error", "Only the account holder may edit their profile or change their password");
-			res.redirect("/users/" + req.params.id);
-		});
-	}else{
-		req.flash("error", "You need to be logged in to do that");
-		res.redirect("/login");
+			return res.redirect("/users/" + req.params.id);
+		} catch (e) {
+			req.flash("error", "User not found");
+			return res.redirect("/campgrounds");
+		}
 	}
+	req.flash("error", "You need to be logged in to do that");
+	res.redirect("/login");
 }
 	
 module.exports = middleware;

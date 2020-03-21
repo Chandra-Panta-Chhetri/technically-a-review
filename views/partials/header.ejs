@@ -20,7 +20,7 @@
 			  </button>
 			  <div class="collapse navbar-collapse" id="navbarMenu">
 				<ul class="navbar-nav ml-auto">
-					<% if(!user){ %>
+					<% if(!currentUser){ %>
 						<li class="nav-item <%= typeof page !== 'undefined' && page === 'login' ? 'active-page' : '' %>">
 							<a class="nav-link" href="/login">Login</a>
 						</li>
@@ -29,7 +29,10 @@
 						</li>
 					<% } else { %>
 						<li class="nav-item">
-							<a class="nav-link" href="#">Signed In as <%= user.username %></a>
+							<a class="nav-link" href="#">Signed In as <%= currentUser.username %></a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link" href="/users/<%= currentUser._id %>">View Profile</a>
 						</li>
 						<li class="nav-item">
 							<a class="nav-link" href="/logout">Logout</a>

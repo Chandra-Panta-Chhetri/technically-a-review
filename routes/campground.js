@@ -1,95 +1,75 @@
-var express 	= require("express"),
-	router 		= express.Router(),
-	Camp   		= require("../models/camp"),
-	middleware  = require("../middleware/index");
+const express 	 = require("express"),
+	  router 	 = express.Router(),
+	  Camp   	 = require("../models/camp"),
+	  middleware = require("../middleware/index");
 
+const escapeRegex = (text) => text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 
-function escapeRegex(text) {
-    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-};
-
-//INDEX
-router.get("/", function(req, res){
-	if(req.query.search){
-		const regex = new RegExp(escapeRegex(req.query.search), 'gi');
-		Camp.find({$or: [{name: regex}, {"author.username":regex}]}, function(err, camps){
-			if(err){
-				req.redirect("/");
-			}else{
-				res.render("campground/campgrounds", {campList: camps, page: 'campgrounds', searched: true});
-			}
-		});
-	}else{
-		Camp.find({}, function(err, camps){
-			if(err){
-				req.redirect("/");
-			}else{
-				res.render("campground/campgrounds", {campList: camps, page: 'campgrounds', searched: false});
-			}
-		});	
+router.get("/", async (req, res) => {
+	var camps;
+	try {
+		if(req.query.search){
+			const regex = new RegExp(escapeRegex(req.query.search), 'gi');
+			camps = await Camp.find({$or: [{name: regex}, {"author.username":regex}]});
+			return res.render("campground/campgrounds", {camps, page: 'campgrounds', searched: true});
+		}
+		camps = await Camp.find({});
+		return 	res.render("campground/campgrounds", {camps, page: 'campgrounds', searched: false});
+	} catch (e) {
+		res.redirect("/");
 	}
 });
 
-//NEW
-router.get("/new", middleware.isLoggedIn, function(req, res){
-	res.render("campground/newCampground");
+router.get("/new", middleware.isLoggedIn, (req, res) => res.render("campground/newCampground"));
+
+router.post("/", middleware.isLoggedIn, async (req, res) => {
+	try {
+		await Camp.create({...req.body.camp, author: {id: req.user._id, username: req.user.username}});
+		return res.redirect("/campgrounds");
+	} catch (e) {
+		req.flash("error", "Cannot create a camp at this time. Please try again later.");
+		return res.redirect("/campgrounds");
+	}
 });
 
-//CREATE
-router.post("/", middleware.isLoggedIn, function(req, res){
-	var newCamp = req.body.camp;
-		newCamp.author = {id: req.user._id, username: req.user.username};
-	Camp.create(newCamp, function(err, camp){
-		if(err){
-			console.log("database error");
-		}else{
-			res.redirect("/campgrounds");
+router.get("/:id", async (req, res) => {
+	try {
+		const camp = await Camp.findById(req.params.id).populate("comments").exec();
+		if(!camp){
+			throw new Error();
 		}
-	});
+		return res.render("campground/showCampground", {camp});
+	} catch (e) {
+		req.flash("error", "Campground not found");
+		return res.redirect("/campgrounds")
+	}
 });
 
-//SHOW
-router.get("/:id", function(req, res){
-	Camp.findById(req.params.id).populate("comments").exec(function(err, camp){
-		if(err || !camp){
-			req.flash("error", "Campground not found");
-			res.redirect("/campgrounds")
-		}else{
-			res.render("campground/showCampground", {camp: camp});
-		}
-	});
+router.get("/:id/edit", middleware.hasCampAuth, async (req, res) => {
+	const camp = await Camp.findById(req.params.id);
+	return res.render("campground/editCampground", {camp});
 });
 
-//EDIT
-router.get("/:id/edit", middleware.hasCampAutherization, function(req, res){
-	Camp.findById(req.params.id, function(err, foundCamp){
-		res.render("campground/editCampground", {camp: foundCamp});
-	});
+router.put("/:id", middleware.hasCampAuth, async (req, res) => {
+	try {
+		const updatedCamp = await Camp.findByIdAndUpdate(req.params.id, req.body.camp);
+		req.flash("success", "Camp Successfully Updated!");
+		return res.redirect("/campgrounds/" + req.params.id);
+	} catch (e) {
+		req.flash("error", "Cannot update at this time. Please try again later.");
+		return res.redirect("/campgrounds");
+	}
 });
 
-
-//UPDATE
-router.put("/:id", middleware.hasCampAutherization, function(req, res){
-	Camp.findByIdAndUpdate(req.params.id, req.body.camp, function(err, updatedCamp){
-		if(err){
-			res.redirect("/campgrounds");
-		}else{
-			req.flash("success", "Camp Successfully Updated!");
-			res.redirect("/campgrounds/" + req.params.id);
-		}
-	});
-});
-
-//DESTORY
-router.delete("/:id", middleware.hasCampAutherization, function(req, res){
-	Camp.findByIdAndRemove(req.params.id, function(err){
-		if(err){
-			req.flash("error", "Something went wrong while attempting to delete the campground");
-			res.redirect("/campgrounds/" + req.params.id);
-		}
+router.delete("/:id", middleware.hasCampAuth, async (req, res) => {
+	try {
+		await Camp.findByIdAndRemove(req.params.id);
 		req.flash("success", "Campground deleted successfully!");
-		res.redirect("/campgrounds");
-	});
+		return res.redirect("/campgrounds");
+	} catch (e) {
+		req.flash("error", "Cannot delete at this time. Please try again later.");
+		res.redirect("/campgrounds/" + req.params.id);
+	}
 });
 
 module.exports = router;
