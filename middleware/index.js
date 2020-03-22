@@ -51,6 +51,17 @@ middleware.hasCommentAuth = async (req, res, next) =>{
 	res.redirect("/login");
 }
 
+middleware.commentStatus = async (commentedCamps, campsID) => await commentedCamps.some((campId) => campId.equals(campsID));
+
+middleware.hasCommented = async function(req, res, next) {
+	const hasReviewed = await middleware.commentStatus(req.user.commentedCamps, req.params.id);
+	if(hasReviewed){
+		req.flash("error", "You have previously commented. You can only edit your review.");
+		return res.redirect(`/campgrounds/${req.params.id}/`);
+	}
+	next();
+}
+
 middleware.hasProfileAuth = async (req, res, next) => {
 	if(req.isAuthenticated()){
 		try {

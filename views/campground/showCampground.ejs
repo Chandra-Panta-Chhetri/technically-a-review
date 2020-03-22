@@ -32,7 +32,11 @@
 			</div>
 			
 			<div class="my-3 p-3 rounded border bg-light">
-				<a class="btn btn-md btn-success float-right mb-2" href="/campgrounds/<%= camp._id %>/comments/new">Add Comment</a>
+				<% if(hasCommented){ %>
+					<button class="btn btn-md btn-secondary float-right mb-2" disabled>Add Comment</button>
+				<% } else{ %>
+					<a class="btn btn-md btn-success float-right mb-2" href="/campgrounds/<%= camp._id %>/comments/new">Add Comment</a>
+				<% }%>
 				<hr>
 				<% camp.comments.forEach(function(comment){ %>
 					<p>

@@ -4,7 +4,7 @@ const express 	  = require("express"),
 	  Comment     = require("../models/comment"),
 	  middleware  = require("../middleware/index");
 
-router.get("/new", middleware.isLoggedIn, async (req, res) => {
+router.get("/new", middleware.isLoggedIn, middleware.hasCommented, async (req, res) => {
 	try {
 		const camp = await Camp.findById(req.params.id);
 		if(!camp){
@@ -17,7 +17,7 @@ router.get("/new", middleware.isLoggedIn, async (req, res) => {
 	}
 });
 
-router.post("/", middleware.isLoggedIn, async (req, res) => {
+router.post("/", middleware.isLoggedIn, middleware.hasCommented, async (req, res) => {
 	try {
 		const camp = await Camp.findById(req.params.id);
 		if(!camp){
@@ -26,9 +26,11 @@ router.post("/", middleware.isLoggedIn, async (req, res) => {
 		const comment = await Comment.create(req.body.comment);
 		comment.author.id = req.user._id;
 		comment.author.username = req.user.username;
-		comment.save();
+		await comment.save();
 		camp.comments.push(comment);
-		camp.save();
+		await camp.save();
+		req.user.commentedCamps.push(req.params.id);
+		await req.user.save();
 		return res.redirect("/campgrounds/" + req.params.id);
 	} catch (e) {
 		req.flash("error", "Campground not found");
@@ -57,11 +59,19 @@ router.put("/:commentId", middleware.hasCommentAuth, async (req, res) => {
 
 router.delete("/:commentId", middleware.hasCommentAuth, async (req, res) => {
 	try {
+		const camp = await Camp.findById(req.params.id);
+		if(!camp){
+			throw new Error();
+		}
 		await Comment.findByIdAndRemove(req.params.commentId);
+		req.user.commentedCamps = req.user.commentedCamps.filter((campId) => !campId.equals(req.params.id));
+		camp.comments = camp.comments.filter((comment) => !comment.equals(req.params.commentId));
+		await camp.save();
+		await req.user.save();
 		req.flash("success", "Comment was successfully deleted!");
-		return res.redirect("/campgrounds");
+		return res.redirect(`/campgrounds/${req.params.id}`);
 	} catch (e) {
-		req.flash("error", "Cannot delete the comment at this time, please try again later.");
+		req.flash("error", "Camp not found.");
 		return res.redirect("/campgrounds/" + req.params.id);
 	}
 });

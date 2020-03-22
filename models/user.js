@@ -9,7 +9,8 @@ const mongoose 			    = require("mongoose"),
 		avatar: {type: String, required: true},
 		resetPasswordToken: String,
 		resetPasswordExpires: Date,
-		isAdmin: {type: Boolean, default: false}
+		isAdmin: {type: Boolean, default: false},
+		commentedCamps: [{type: mongoose.Schema.Types.ObjectId, ref: "Camp"}]
 	  });
 
 userSchema.plugin(passportLocalMongoose);
