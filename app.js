@@ -8,7 +8,7 @@
  	   passport 				= require("passport"),
 	   indexRoutes				= require("./routes/index"),
 	   commentRoutes			= require("./routes/comments"),
-	   campgroundRoutes			= require("./routes/campground"),
+	   campgroundRoutes			= require("./routes/campgrounds"),
 	   userRoutes				= require("./routes/users"),
 	   methodOverride			= require("method-override"),
 	   flash					= require("connect-flash");

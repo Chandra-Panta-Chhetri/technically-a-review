@@ -40,8 +40,16 @@
 				<hr>
 				<% camp.comments.forEach(function(comment){ %>
 					<p>
-						<strong><%= comment.author.username %></strong>
+						<% for(var i = 1; i <= 5; i++){ %>
+							<% if(i <= comment.rating){ %>
+								<i class="fas fa-star"></i>
+							<% }else{ %>
+								<i class="far fa-star"></i>
+							<% } %>
+						<% } %>
 						<span class="float-right"><%= moment(comment.createdAt).fromNow() %></span>
+						<br>
+						<strong><%= comment.author.username %></strong>
 					</p>
 					<p><%= comment.content %></p>
 					<% if(currentUser && (comment.author.id.equals(currentUser._id) || currentUser.isAdmin)) { %>
