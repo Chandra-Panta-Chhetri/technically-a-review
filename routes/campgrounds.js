@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
 			return res.render("campground/campgrounds", {camps, page: 'campgrounds', searched: true});
 		}
 		camps = await Camp.find({});
-		return 	res.render("campground/campgrounds", {camps, page: 'campgrounds', searched: false});
+		return res.render("campground/campgrounds", {camps, page: 'campgrounds', searched: false});
 	} catch (e) {
 		res.redirect("/");
 	}
@@ -34,7 +34,10 @@ router.post("/", middleware.isLoggedIn, async (req, res) => {
 
 router.get("/:id", async (req, res) => {
 	try {
-		const camp = await Camp.findById(req.params.id).populate("comments").exec();
+		const camp = await Camp.findById(req.params.id).populate({
+			path: "comments",
+			options: {sort: {updatedAt: -1}}
+		}).exec();
 		if(!camp){
 			throw new Error();
 		}
@@ -56,9 +59,9 @@ router.get("/:id/edit", middleware.hasCampAuth, async (req, res) => {
 
 router.put("/:id", middleware.hasCampAuth, async (req, res) => {
 	try {
-		const updatedCamp = await Camp.findByIdAndUpdate(req.params.id, req.body.camp);
+		await Camp.findByIdAndUpdate(req.params.id, req.body.camp);
 		req.flash("success", "Camp Successfully Updated!");
-		return res.redirect("/campgrounds/" + req.params.id);
+		return res.redirect(`/campgrounds/${req.params.id}`);
 	} catch (e) {
 		req.flash("error", "Cannot update at this time. Please try again later.");
 		return res.redirect("/campgrounds");
@@ -67,12 +70,13 @@ router.put("/:id", middleware.hasCampAuth, async (req, res) => {
 
 router.delete("/:id", middleware.hasCampAuth, async (req, res) => {
 	try {
-		await Camp.findByIdAndRemove(req.params.id);
+		const camp = await Camp.findById(req.params.id).populate("comments").exec();
+		camp.remove();
 		req.flash("success", "Campground deleted successfully!");
 		return res.redirect("/campgrounds");
 	} catch (e) {
 		req.flash("error", "Cannot delete at this time. Please try again later.");
-		res.redirect("/campgrounds/" + req.params.id);
+		res.redirect(`/campgrounds/${req.params.id}`);
 	}
 });
 

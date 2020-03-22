@@ -4,6 +4,15 @@ const express 	  = require("express"),
 	  Comment     = require("../models/comment"),
 	  middleware  = require("../middleware/index");
 
+
+function calculateAvgRating(comments){
+	var totalRating = 0;
+	comments.forEach((comment) => {
+		totalRating += comment.rating;
+	});
+	return Math.ceil(totalRating / comments.length);
+}
+
 router.get("/new", middleware.isLoggedIn, middleware.hasCommented, async (req, res) => {
 	try {
 		const camp = await Camp.findById(req.params.id);
@@ -19,7 +28,7 @@ router.get("/new", middleware.isLoggedIn, middleware.hasCommented, async (req, r
 
 router.post("/", middleware.isLoggedIn, middleware.hasCommented, async (req, res) => {
 	try {
-		const camp = await Camp.findById(req.params.id);
+		const camp = await Camp.findById(req.params.id).populate("comments").exec();
 		if(!camp){
 			throw new Error();
 		}
@@ -28,6 +37,7 @@ router.post("/", middleware.isLoggedIn, middleware.hasCommented, async (req, res
 		comment.author.username = req.user.username;
 		await comment.save();
 		camp.comments.push(comment);
+		camp.avgRating = calculateAvgRating(camp.comments);
 		await camp.save();
 		req.user.commentedCamps.push(req.params.id);
 		await req.user.save();
@@ -46,9 +56,12 @@ router.get("/:commentId/edit", middleware.hasCommentAuth, async (req, res) => {
 router.put("/:commentId", middleware.hasCommentAuth, async (req, res) => {
 	try {
 		const updatedComment = await Comment.findByIdAndUpdate(req.params.commentId, req.body.comment);
-		if(!updatedComment){
+		const camp = await Camp.findById(req.params.id).populate("comments").exec();
+		if(!updatedComment | !camp){
 			throw new Error();
 		}
+		camp.avgRating = calculateAvgRating(camp.comments);
+		await camp.save();
 		req.flash("success", "Comment Successfully Updated!");
 		return res.redirect("/campgrounds/" + req.params.id);
 	} catch (e) {
@@ -59,13 +72,14 @@ router.put("/:commentId", middleware.hasCommentAuth, async (req, res) => {
 
 router.delete("/:commentId", middleware.hasCommentAuth, async (req, res) => {
 	try {
-		const camp = await Camp.findById(req.params.id);
+		const camp = await Camp.findById(req.params.id).populate("comments").exec();
 		if(!camp){
 			throw new Error();
 		}
 		await Comment.findByIdAndRemove(req.params.commentId);
 		req.user.commentedCamps = req.user.commentedCamps.filter((campId) => !campId.equals(req.params.id));
 		camp.comments = camp.comments.filter((comment) => !comment.equals(req.params.commentId));
+		camp.avgRating = calculateAvgRating(camp.comments);
 		await camp.save();
 		await req.user.save();
 		req.flash("success", "Comment was successfully deleted!");
