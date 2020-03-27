@@ -1,12 +1,10 @@
 const mongoose 	    = require("mongoose");
-	  User		    = require("./user"),
-	  campSchema 	= new mongoose.Schema
-	  ({
-			name: {type: String, unique: true},
-			image: String,
-			description: String,
-			price: String,
-			comments: [{type: mongoose.Schema.Types.ObjectId, ref: "Comment"}],
+	  Comment		= require("./comment"),
+	  campSchema 	= new mongoose.Schema({
+			name: {type: String, unique: true, required: true},
+			image: {type: String, required: true},
+			description: {type: String, required: true},
+			price: {type: String, required: true},
 			author: 
 			{
 				id: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
@@ -15,16 +13,15 @@ const mongoose 	    = require("mongoose");
 			avgRating: {type: Number, default: 0}
 		}, {timestamps: true});
 
+campSchema.virtual("comments", {
+	ref: "Comment",
+	localField: "_id",
+	foreignField: "campId"
+});
+
 campSchema.pre("remove", async function(next){
-	const camp = this;
-	camp.comments.forEach(async function (comment){
-		let author = await User.findById(comment.author.id);
-		author.commentedCamps = author.commentedCamps.filter(function (campId) {
-			return !campId.equals(camp._id);
-		});
-		await author.save();
-		comment.remove();		
-	});
+	await Comment.deleteMany({campId: this._id});
 	next();
 });
+
 module.exports = mongoose.model("Camp", campSchema);

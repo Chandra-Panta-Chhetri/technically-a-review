@@ -48,7 +48,3 @@ h1 + img{
 	font-size: 25px;
 	font-weight: bold;
 }
-
-button:disabled {
-	cursor: not-allowed;
-}

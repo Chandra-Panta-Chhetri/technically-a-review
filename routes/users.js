@@ -4,72 +4,60 @@ const express 	 = require("express"),
       User       = require("../models/user"),
       middleware = require("../middleware/index");
 
-router.get("/:id", async (req, res) => {
+router.get("/:userId", async (req, res) => {
 	try {
-		const user = await User.findById(req.params.id);
+		const user = await User.findById(req.params.userId);
 		if(!user){
 			throw new Error();
 		}
 		const usersCamps = await Camp.find({"author.id": user._id});
-		return res.render("user/userInfo", {campCreator: user, usersCamps});
+		return res.render("user/show", {campCreator: user, usersCamps});
 	} catch (e) {
-		req.flash("error", "User not found");
+		req.flash("error", "No user found");
 		return res.redirect("/campgrounds");
 	}
 });
 
-router.get("/:id/edit", middleware.hasProfileAuth, async (req, res) => {
-	try {
-		const user = await User.findById(req.params.id);
-		if(!user){
-			throw new Error();
-		}
-		return res.render("user/editProfile", {user});
-	} catch (e) {
-		req.flash("error", "User not found.");
-		return res.redirect("back");
-	}
+router.get("/:userId/edit", middleware.isLoggedIn, middleware.hasProfileAuth, async (req, res) => {
+	const user = await User.findById(req.params.userId);
+	return res.render("user/edit", {user});
 });
 
 
-router.put("/:id", middleware.hasProfileAuth, async (req, res) => {
+router.put("/:userId", middleware.isLoggedIn, middleware.hasProfileAuth, async (req, res) => {
 	try {
-		const updatedUser = await User.findOneAndUpdate({_id: req.params.id}, {$set: 
+		await User.findByIdAndUpdate(req.params.userId, {$set: 
 			{
 				fullName: req.body.name, 
 				email: req.body.email, 
 				avatar: req.body.avatar
 			}});
 		req.flash("success", "User info successfully updated!");
-		return res.redirect("/users/" + req.params.id);
 	} catch (e) {
 		req.flash("error", "Cannot update user info at this time. Please try again later.");
-		return res.redirect("/user/" + req.params.id);
 	}
+	return res.redirect(`/users/${req.params.userId}`);
 });
 
-router.get("/:id/changePassword", middleware.hasProfileAuth, (req, res) => res.render("user/changePassword", {userId: req.params.id}));
+router.get("/:userId/changePassword", middleware.isLoggedIn, middleware.hasProfileAuth, (req, res) => res.render("user/changePassword", {userId: req.params.userId}));
 
-router.post("/:id/changePassword", middleware.hasProfileAuth, async (req, res) => {
+router.post("/:userId/changePassword", middleware.isLoggedIn, middleware.hasProfileAuth, async (req, res) => {
 	try {
-		const user = await User.findById(req.params.id);
-		if(!user){
-			throw new Error();
-		}
+		const user = await User.findById(req.params.userId);
 		if(req.body.newPass === req.body.confirmNewPass){
 			return user.changePassword(req.body.currentPass, req.body.newPass, (err) => {
 				if(err){
-					req.flash("error", "Current password is wrong");
-					return res.redirect("/users/" + req.params.id + "/changePassword");
+					req.flash("error", "The current password you entered was wrong.");
+					return res.redirect(`/users/${req.params.userId}/changePassword`);
 				}
 				req.flash("success", "Password has been succesfully changed");
-				res.redirect("/users/" + req.params.id);
+				return res.redirect(`/users/${req.params.userId}`);
 			});
 		}
 		req.flash("error", "Please make sure passwords match");
-		return res.redirect("/users/" + req.params.id + "/changePassword");
+		return res.redirect(`/users/${req.params.userId}/changePassword`);
 	} catch (e) {
-		req.flash("error", "User not found.");
+		req.flash("error", "No, user found.");
 		return res.redirect("/campgrounds");
 	}
 });

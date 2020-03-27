@@ -39,14 +39,19 @@
 						<i class="far fa-star"></i>
 					<% } %>
 				<% } %>
-				<span>(Total Reviews: <%= camp.comments.length %>)</span>
-				<% if(hasCommented){ %>
-					<button class="btn btn-md btn-secondary float-right mb-2" disabled>Add Comment</button>
-				<% } else{ %>
-					<a class="btn btn-md btn-success float-right mb-2" href="/campgrounds/<%= camp._id %>/comments/new">Add Comment</a>
-				<% }%>
+				<span>(Total Reviews: <%= comments.length %>)</span>
+				<div class="float-right mb-2">
+					<% if(commentId !== -1){ %>
+						<a class="btn btn-xs btn-warning" href="/campgrounds/<%= camp._id %>/comments/<%= commentId %>/edit">Edit</a>
+						<form action="/campgrounds/<%= camp._id %>/comments/<%= commentId %>/?_method=DELETE" method="POST">
+							<button class="btn btn-xs btn-danger">Delete</button>
+						</form>
+					<% } else{ %>
+						<a class="btn btn-md btn-success float-right mb-2" href="/campgrounds/<%= camp._id %>/comments/new">Add Comment</a>
+					<% }%>
+				</div>
 				<hr>
-				<% camp.comments.forEach(function(comment){ %>
+				<% comments.forEach(function(comment){ %>
 					<p>
 						<% for(var i = 1; i <= 5; i++){ %>
 							<% if(i <= comment.rating){ %>
@@ -55,16 +60,18 @@
 								<i class="far fa-star"></i>
 							<% } %>
 						<% } %>
-						<span class="float-right"><%= moment(comment.createdAt).fromNow() %></span>
+						<span class="float-right">Posted: <%= moment(comment.createdAt).fromNow() %></span>
 						<br>
-						<strong><%= comment.author.username %></strong>
+						<strong><a href="/users/<%= camp.author.id %>"><%= comment.author.username %></a></strong>
 					</p>
 					<p><%= comment.content %></p>
-					<% if(currentUser && (comment.author.id.equals(currentUser._id) || currentUser.isAdmin)) { %>
-						<a class="btn btn-xs btn-warning" href="/campgrounds/<%= camp._id %>/comments/<%= comment._id %>/edit">Edit</a>
-						<form action="/campgrounds/<%= camp._id %>/comments/<%= comment._id %>/?_method=DELETE" method="POST">
-							<button class="btn btn-xs btn-danger">Delete</button>
-						</form>
+					<% if(currentUser && currentUser.isAdmin) { %>
+						<div class="mb-2">
+							<a class="btn btn-xs btn-warning" href="/campgrounds/<%= camp._id %>/comments/<%= comment._id %>/edit">Edit</a>
+							<form action="/campgrounds/<%= camp._id %>/comments/<%= comment._id %>/?_method=DELETE" method="POST">
+								<button class="btn btn-xs btn-danger">Delete</button>
+							</form>
+						</div>
 					<% } %>
 				<% }); %>
 			</div>

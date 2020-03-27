@@ -24,7 +24,7 @@ mongoose.connect(process.env.DBURL, {
 });
 
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(`${__dirname}/public`));
 app.use(flash());
 app.set("view engine", "ejs");
 
@@ -48,7 +48,7 @@ app.use((req, res, next) => {
 app.use("/", indexRoutes);
 app.use("/users", userRoutes);
 app.use("/campgrounds", campgroundRoutes);
-app.use("/campgrounds/:id/comments", commentRoutes);
+app.use("/campgrounds/:campId/comments", commentRoutes);
 
 app.listen(process.env.PORT, process.env.IP, () => {
 	console.log("Server Online...");

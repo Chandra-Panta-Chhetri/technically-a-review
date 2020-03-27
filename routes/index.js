@@ -12,7 +12,7 @@ router.get("/login", (req, res) => res.render("user/login", {page: 'login'}));
 
 router.post("/login", passport.authenticate('local', { failureRedirect: '/login', failureFlash: "Incorrect username or password."}),
   (req, res) => {
-	req.flash("success", "Welcome to Yelp Camp, " + req.user.username + "!");
+	req.flash("success", `Welcome back ${req.user.username}!`);
 	return res.redirect("/campgrounds");
 });
 
@@ -26,7 +26,7 @@ router.post("/signup", async (req, res) => {
 		delete req.body.newUser.password;
 		const user = await User.register(req.body.newUser, userPassword);
 		req.logIn(user, (err) => {
-			req.flash("success", "Welcome to Yelp Camp " + user.username);
+			req.flash("success", `Welcome to Yelp Camp ${user.username}!`);
 			return res.redirect("/campgrounds");
 		});
 	} catch (e) {
@@ -54,7 +54,7 @@ router.post("/forgot", (req, res) => {
 		(token, done) => {
 		 	User.findOne({username: req.body.username, email: req.body.email}, (err, user) => {
 				if(err || !user){
-					req.flash("error", "User with provided username or email does not exist.");
+					req.flash("success", `To reset your password, please follow the instructions sent to ${req.body.email}`);
 					return res.redirect("/forgot");
 				}
 				user.resetPasswordToken = token;
@@ -72,7 +72,7 @@ router.post("/forgot", (req, res) => {
 					pass: process.env.GMAILPW
 				}
 			});
-			var mailContent = "You or someone requested a password change for the user with username: " + user.username + ".\nPlease click on the link below to reset your password:\n" + 'http://' + req.headers.host + '/reset/' + token + "\nNote: This link will expire in 15 mins.";
+			var mailContent = `You or someone requested a password change for the user with username: ${user.username}.\nPlease click on the link below to reset your password:\nhttp://${req.headers.host}/reset/${token}\nNote: This link will expire in 15 mins.`;
 			var mailOptions = {
 				to: user.email,
 				from: 'infonodeapp@gmail.com',
@@ -80,7 +80,7 @@ router.post("/forgot", (req, res) => {
 				text: mailContent
 			};
 			smtpTransport.sendMail(mailOptions, (err) => {
-				req.flash("success", "To reset your password, please follow the instructions sent to " + req.body.email);
+				req.flash("success", `To reset your password, please follow the instructions sent to ${req.body.email}`);
 				done(err, 'done');
 			});
 		},
@@ -117,7 +117,7 @@ router.post("/reset/:token", (req, res) => {
 				 });
 			 }else{
 				 req.flash("error", "Passwords did not match");
-				 res.redirect("back");
+				 res.redirect(`/reset/${req.params.token}`);
 			 }
 			});
 		}, 

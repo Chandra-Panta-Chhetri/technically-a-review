@@ -1,6 +1,7 @@
 const express 	 = require("express"),
 	  router 	 = express.Router(),
 	  Camp   	 = require("../models/camp"),
+	  Comment    = require("../models/comment"),
 	  middleware = require("../middleware/index");
 
 const escapeRegex = (text) => text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
@@ -10,73 +11,73 @@ router.get("/", async (req, res) => {
 	try {
 		if(req.query.search){
 			const regex = new RegExp(escapeRegex(req.query.search), 'gi');
-			camps = await Camp.find({$or: [{name: regex}, {"author.username":regex}]});
-			return res.render("campground/campgrounds", {camps, page: 'campgrounds', searched: true});
+			camps = await Camp.find({$or: [{name: regex}, {"author.username": regex}]});
+			return res.render("campground/index", {camps, page: 'campgrounds', searched: true});
 		}
 		camps = await Camp.find({});
-		return res.render("campground/campgrounds", {camps, page: 'campgrounds', searched: false});
+		for(const camp of camps){
+			await camp.populate("comments").execPopulate();
+		}
+		return res.render("campground/index", {camps, page: 'campgrounds', searched: false});
 	} catch (e) {
 		res.redirect("/");
 	}
 });
 
-router.get("/new", middleware.isLoggedIn, (req, res) => res.render("campground/newCampground"));
+router.get("/new", middleware.isLoggedIn, (req, res) => res.render("campground/new"));
 
 router.post("/", middleware.isLoggedIn, async (req, res) => {
 	try {
 		await Camp.create({...req.body.camp, author: {id: req.user._id, username: req.user.username}});
-		return res.redirect("/campgrounds");
 	} catch (e) {
 		req.flash("error", "Cannot create a camp at this time. Please try again later.");
-		return res.redirect("/campgrounds");
 	}
+	return res.redirect("/campgrounds");
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:campId", async (req, res) => {
 	try {
-		const camp = await Camp.findById(req.params.id).populate({
-			path: "comments",
-			options: {sort: {updatedAt: -1}}
-		}).exec();
+		const comments = await Comment.find({campId: req.params.campId});
+		const camp = await Camp.findById(req.params.campId);
 		if(!camp){
 			throw new Error();
 		}
 		if(req.user){
-			const hasCommented = await middleware.commentStatus(req.user.commentedCamps, req.params.id);
-			return res.render("campground/showCampground", {camp, hasCommented});
+			const comment = await middleware.commentStatus(req.user._id, req.params.campId);
+			return res.render("campground/show", {camp, comments, commentId: comment === null ? -1 : comment._id});
 		}
-		return res.render("campground/showCampground", {camp, hasCommented: false});
+		return res.render("campground/showCampground", {camp, comments, commentId: -1});
 	} catch (e) {
-		req.flash("error", "Campground not found");
+		req.flash("error", "Sorry, no campground found.");
 		return res.redirect("/campgrounds")
 	}
 });
 
-router.get("/:id/edit", middleware.hasCampAuth, async (req, res) => {
-	const camp = await Camp.findById(req.params.id);
-	return res.render("campground/editCampground", {camp});
+router.get("/:campId/edit", middleware.isLoggedIn, middleware.hasCampAuth, async (req, res) => {
+	const camp = await Camp.findById(req.params.campId);
+	return res.render("campground/edit", {camp});
 });
 
-router.put("/:id", middleware.hasCampAuth, async (req, res) => {
+router.put("/:campId", middleware.isLoggedIn, middleware.hasCampAuth, async (req, res) => {
 	try {
-		await Camp.findByIdAndUpdate(req.params.id, req.body.camp);
+		await Camp.findByIdAndUpdate(req.params.campId, req.body.camp);
 		req.flash("success", "Camp Successfully Updated!");
-		return res.redirect(`/campgrounds/${req.params.id}`);
+		return res.redirect(`/campgrounds/${req.params.campId}`);
 	} catch (e) {
 		req.flash("error", "Cannot update at this time. Please try again later.");
 		return res.redirect("/campgrounds");
 	}
 });
 
-router.delete("/:id", middleware.hasCampAuth, async (req, res) => {
+router.delete("/:campId", middleware.isLoggedIn, middleware.hasCampAuth, async (req, res) => {
 	try {
-		const camp = await Camp.findById(req.params.id).populate("comments").exec();
+		const camp = await Camp.findById(req.params.campId);
 		camp.remove();
 		req.flash("success", "Campground deleted successfully!");
 		return res.redirect("/campgrounds");
 	} catch (e) {
 		req.flash("error", "Cannot delete at this time. Please try again later.");
-		res.redirect(`/campgrounds/${req.params.id}`);
+		res.redirect(`/campgrounds/${req.params.campId}`);
 	}
 });
 

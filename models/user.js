@@ -1,7 +1,6 @@
 const mongoose 			    = require("mongoose"),
 	  passportLocalMongoose = require("passport-local-mongoose"),
-	  userSchema 			= new mongoose.Schema
-	  ({
+	  userSchema 			= new mongoose.Schema({
 		username: {type: String, unique: true, required: true},
 		password: String,
 		fullName: {type: String, required: true},
@@ -9,8 +8,7 @@ const mongoose 			    = require("mongoose"),
 		avatar: {type: String, required: true},
 		resetPasswordToken: String,
 		resetPasswordExpires: Date,
-		isAdmin: {type: Boolean, default: false},
-		commentedCamps: [{type: mongoose.Schema.Types.ObjectId, ref: "Camp"}]
+		isAdmin: {type: Boolean, default: false}
 	  });
 
 userSchema.plugin(passportLocalMongoose);
