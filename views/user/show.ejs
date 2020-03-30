@@ -1,11 +1,11 @@
 <%- include("../partials/header") %>
-<div class="row pt-5">
-	<div class="col-5">
+<div class="row pt-5 text-center">
+	<div class="col-12 col-lg-5 order-2 order-lg-1 mt-3 mt-lg-0">
 		<h3>Created Campgrounds:</h3>
 		<% if(usersCamps.length == 0) { %>
 			<p>No camps created yet.</p>
 		<% } %>
-		<ul>
+		<ul class="pl-0">
 			<% usersCamps.forEach(function(camp){ %>
 				<li>
 					<a href="/campgrounds/<%= camp._id %>"><%= camp.name %></a> - Created <%= moment(camp.createdAt).fromNow() %>
@@ -13,7 +13,7 @@
 			<% });%>
 		</ul>
 	</div>
-	<div class="col-7 text-center">
+	<div class="col-12 col-lg-7 order-1 order-lg-2">
 		<h1><%= campCreator.fullName %></h1>
 		<img src="<%= campCreator.avatar %>">
 		<% if(currentUser && currentUser._id.equals(campCreator._id)) { %>
