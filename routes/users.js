@@ -39,6 +39,18 @@ router.put("/:userId", middleware.isLoggedIn, middleware.hasProfileAuth, async (
 	return res.redirect(`/users/${req.params.userId}`);
 });
 
+router.delete("/:userId", middleware.isLoggedIn, middleware.hasProfileAuth, async(req, res) => {
+	try {
+		const user = await User.findById(req.params.userId);
+		user.remove();
+		req.flash("success", "Account has been closed successfully!");
+		return res.redirect("/campgrounds");
+	} catch (e) {
+		req.flash("error", "Cannot delete account at this time. Please try again later.");
+		return res.redirect(`/users/${req.params.userId}`);
+	}
+});
+
 router.get("/:userId/changePassword", middleware.isLoggedIn, middleware.hasProfileAuth, (req, res) => res.render("user/changePassword", {userId: req.params.userId}));
 
 router.post("/:userId/changePassword", middleware.isLoggedIn, middleware.hasProfileAuth, async (req, res) => {

@@ -62,7 +62,7 @@ middleware.hasProfileAuth = async (req, res, next) => {
 			}else if(user._id.equals(req.user._id)){
 				return next();
 			}
-			req.flash("error", "Sorry, only the account holder may edit their profile or change their password.");
+			req.flash("error", "Sorry, only the account holder may make profile modifications.");
 			return res.redirect(`/users/${req.params.userId}`);
 		} catch (e) {
 			req.flash("error", "Sorry, no user found.");

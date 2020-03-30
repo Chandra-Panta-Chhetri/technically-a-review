@@ -46,7 +46,7 @@ router.get("/:campId", async (req, res) => {
 			const comment = await middleware.commentStatus(req.user._id, req.params.campId);
 			return res.render("campground/show", {camp, comments, commentId: comment === null ? -1 : comment._id});
 		}
-		return res.render("campground/showCampground", {camp, comments, commentId: -1});
+		return res.render("campground/show", {camp, comments, commentId: -1});
 	} catch (e) {
 		req.flash("error", "Sorry, no campground found.");
 		return res.redirect("/campgrounds")
