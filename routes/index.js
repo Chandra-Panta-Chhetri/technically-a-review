@@ -6,8 +6,6 @@ const express 	 = require("express"),
 	  nodemailer = require("nodemailer"),
 	  crypto	 = require("crypto");
 
-router.get("/", (req, res) => res.render("home"));
-
 router.get("/login", (req, res) => res.render("user/login", {page: 'login'}));
 
 router.post("/login", passport.authenticate('local', { failureRedirect: '/login', failureFlash: "Incorrect username or password."}),
