@@ -10,10 +10,10 @@ const mongoose 	    = require("mongoose");
 			price: {type: String, required: true},
 			author: 
 			{
-				id: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
-				username: String
+				id: {type: mongoose.Schema.Types.ObjectId, ref: "User", required: true},
+				username: {type: String, required: true}
 			},
-			avgRating: {type: Number, default: 0}
+			avgRating: {type: Number, default: 0, min: 0, max: 5}
 		}, {timestamps: true});
 
 campSchema.virtual("comments", {
