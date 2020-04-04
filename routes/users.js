@@ -2,7 +2,9 @@ const express 	 = require("express"),
       router     = express.Router(),
       Camp       = require("../models/camp"),
       User       = require("../models/user"),
-      middleware = require("../middleware/index");
+	  middleware = require("../middleware/index"),
+	  cloudinary = require('./utils/cloudinaryConfig'),
+	  upload     = require('./utils/multerConfig');
 
 router.get("/:userId", async (req, res) => {
 	try {
@@ -24,24 +26,29 @@ router.get("/:userId/edit", middleware.isLoggedIn, middleware.hasProfileAuth, as
 });
 
 
-router.put("/:userId", middleware.isLoggedIn, middleware.hasProfileAuth, async (req, res) => {
+router.put("/:userId", middleware.isLoggedIn, middleware.hasProfileAuth, upload.single('avatar'), async (req, res) => {
 	try {
-		await User.findByIdAndUpdate(req.params.userId, {$set: 
-			{
-				fullName: req.body.name, 
-				email: req.body.email, 
-				avatar: req.body.avatar
-			}});
+		const user = await User.findById(req.params.userId);
+		if(req.file){
+			cloudinary.v2.uploader.destroy(user.avatar.id);
+			const result = await cloudinary.v2.uploader.upload(req.file.path);
+			req.body.user.avatar = {id: result.public_id, url: result.secure_url};
+		}
+		await user.updateOne({$set: req.body.user});
 		req.flash("success", "User info successfully updated!");
 	} catch (e) {
 		req.flash("error", "Cannot update user info at this time. Please try again later.");
 	}
 	return res.redirect(`/users/${req.params.userId}`);
+}, (err, req, res, next) => {
+	req.flash("error", err);
+	res.redirect(`/users/${req.params.userId}/edit`);
 });
 
 router.delete("/:userId", middleware.isLoggedIn, middleware.hasProfileAuth, async(req, res) => {
 	try {
 		const user = await User.findById(req.params.userId);
+		cloudinary.v2.uploader.destroy(user.avatar.id);
 		user.remove();
 		req.flash("success", "Account has been closed successfully!");
 		return res.redirect("/campgrounds");

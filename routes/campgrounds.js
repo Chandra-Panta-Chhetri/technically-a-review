@@ -2,7 +2,9 @@ const express 	 = require("express"),
 	  router 	 = express.Router(),
 	  Camp   	 = require("../models/camp"),
 	  Comment    = require("../models/comment"),
-	  middleware = require("../middleware/index");
+	  middleware = require("../middleware/index"),
+	  cloudinary = require('./utils/cloudinaryConfig'),
+	  upload     = require('./utils/multerConfig');
 
 const escapeRegex = (text) => text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 
@@ -26,13 +28,19 @@ router.get("/", async (req, res) => {
 
 router.get("/new", middleware.isLoggedIn, (req, res) => res.render("campground/new"));
 
-router.post("/", middleware.isLoggedIn, async (req, res) => {
+router.post("/", middleware.isLoggedIn, upload.single('image'), async (req, res) => {
 	try {
-		await Camp.create({...req.body.camp, author: {id: req.user._id, username: req.user.username}});
+		const result = await cloudinary.v2.uploader.upload(req.file.path);
+		req.body.camp.author = {id: req.user._id, username: req.user.username};
+		req.body.camp.image  = {id: result.public_id, url: result.secure_url};
+		await Camp.create(req.body.camp);
 	} catch (e) {
 		req.flash("error", "Cannot create a camp at this time. Please try again later.");
 	}
 	return res.redirect("/campgrounds");
+}, (err, req, res, next) => {
+	req.flash("error", err);
+	res.redirect("/campgrounds/new");
 });
 
 router.get("/:campId", async (req, res) => {
@@ -58,20 +66,30 @@ router.get("/:campId/edit", middleware.isLoggedIn, middleware.hasCampAuth, async
 	return res.render("campground/edit", {camp});
 });
 
-router.put("/:campId", middleware.isLoggedIn, middleware.hasCampAuth, async (req, res) => {
+router.put("/:campId", middleware.isLoggedIn, middleware.hasCampAuth, upload.single('image'), async (req, res) => {
 	try {
-		await Camp.findByIdAndUpdate(req.params.campId, req.body.camp);
+		const camp = await Camp.findById(req.params.campId);
+		if(req.file){
+			cloudinary.v2.uploader.destroy(camp.image.id);
+			const result = await cloudinary.v2.uploader.upload(req.file.path);
+			req.body.camp.image  = {id: result.public_id, url: result.secure_url};
+		}
+		await camp.updateOne({$set: req.body.camp});
 		req.flash("success", "Camp Successfully Updated!");
 		return res.redirect(`/campgrounds/${req.params.campId}`);
 	} catch (e) {
 		req.flash("error", "Cannot update at this time. Please try again later.");
 		return res.redirect("/campgrounds");
 	}
+}, (err, req, res, next) => {
+	req.flash("error", err);
+	res.redirect(`/campgrounds/${req.params.campId}/edit`);
 });
 
 router.delete("/:campId", middleware.isLoggedIn, middleware.hasCampAuth, async (req, res) => {
 	try {
 		const camp = await Camp.findById(req.params.campId);
+		cloudinary.v2.uploader.destroy(camp.image.id);
 		camp.remove();
 		req.flash("success", "Campground deleted successfully!");
 		return res.redirect("/campgrounds");

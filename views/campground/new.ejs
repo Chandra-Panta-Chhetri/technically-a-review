@@ -2,11 +2,14 @@
 <div class="my-3">
 	<h1 class="text-center">Create a New Campground</h1>
 	<div class="my-4">
-			<form action="/campgrounds" method="POST">
+			<form action="/campgrounds" method="POST" enctype="multipart/form-data">
 			<div class="form-group row justify-content-center">
 				<div class="col-12 col-md-6 col-lg-5">
 					<input type="text" class="form-control mb-2" name="camp[name]" placeholder="name" required>
-					<input type="url" name="camp[image]" class="form-control mb-2" placeholder="image url" required>
+					<div class="custom-file mb-2">
+						<input type="file" name="image" class="custom-file-input" id="image" required accept="image/*">
+						<label class="custom-file-label" for="image">Choose Camp Pic</label>
+					</div>
 					<input type="text" name="camp[description]" class="form-control mb-2" placeholder="description" required>
 					<input type="number" name="camp[price]" class="form-control mb-2" placeholder="price" min="0.01" step="0.01" required>
 					<button type="submit" class="btn btn-primary btn-block mb-2">Add</button>
@@ -16,4 +19,5 @@
 		</form>
 	</div>
 </div>
+<script src="/js/agency.js"></script>
 <%- include("../partials/footer") %>

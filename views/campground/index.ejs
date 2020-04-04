@@ -9,7 +9,7 @@
 		<div class="col-10 col-md-12">
 			<h3>No campgrounds match that query, please try again</h3>
 			<form class="form-inline justify-content-center" action="/campgrounds" method="GET">
-			  <input class="form-control mr-sm-2" type="search" name="search" placeholder="Search" aria-label="Search">
+			  <input class="form-control mr-sm-2" type="search" name="search" placeholder="Search">
 			  <button class="btn btn-outline-success my-2 my-sm-0">Search</button>
 			</form>
 		</div>
@@ -19,7 +19,7 @@
 	<% camps.forEach(function(camp){ %>
 		<div class="col-sm-6 col-md-5 col-lg-4 mb-3 d-flex align-self-stretch">
 			<div class="card">
-				<img src="<%= camp.image %>" class="card-img-top">
+				<img src="<%= camp.image.url %>" class="card-img-top">
 				<div class="card-body">
 					<h5 class="card-title"><%= camp.name %></h5>
 					<% for(var i = 1; i <= 5; i++){ %>

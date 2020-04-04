@@ -1,20 +1,20 @@
- const express 					= require("express"),
-	   app 						= express(),
-	   bodyParser 				= require("body-parser"),
-	   mongoose 				= require("mongoose"),
-	   //SeedDB 				= require("./seed"),
-	   User						= require("./models/user"),
-	   LocalStrategy 			= require("passport-local"),
- 	   passport 				= require("passport"),
-	   indexRoutes				= require("./routes/index"),
-	   commentRoutes			= require("./routes/comments"),
-	   campgroundRoutes			= require("./routes/campgrounds"),
-	   userRoutes				= require("./routes/users"),
-	   methodOverride			= require("method-override"),
-	   flash					= require("connect-flash");
+require("dotenv").config();
+const express 				= require("express"),
+	  app 					= express(),
+	  bodyParser 			= require("body-parser"),
+	  mongoose 				= require("mongoose"),
+	  //SeedDB 				= require("./seed"),
+	  User					= require("./models/user"),
+	  LocalStrategy 		= require("passport-local"),
+	  passport 				= require("passport"),
+	  indexRoutes			= require("./routes/index"),
+	  commentRoutes			= require("./routes/comments"),
+	  campgroundRoutes		= require("./routes/campgrounds"),
+	  userRoutes			= require("./routes/users"),
+	  methodOverride		= require("method-override"),
+	  flash					= require("connect-flash");
 
 //SeedDB();
-require("dotenv").config();
 
 mongoose.connect(process.env.DBURL, {
 	useNewUrlParser: true, 

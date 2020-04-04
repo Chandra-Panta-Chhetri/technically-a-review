@@ -2,14 +2,17 @@
 <div class="my-3">
 	<h1 class="text-center">Sign Up</h1>
 	<div class="my-4">
-			<form action="/signup" method="POST">
+		<form action="/signup" method="POST" enctype="multipart/form-data">
 			<div class="form-group row justify-content-center">
 				<div class="col-12 col-md-6 col-lg-5">
 					<input type="text" name="newUser[username]" class="form-control mb-2" placeholder="username" required>
 					<input type="password" name="newUser[password]" class="form-control mb-2" placeholder="password" required>
 					<input type="text" name="newUser[fullName]" class="form-control mb-2" placeholder="full name" required>
 					<input type="email" name="newUser[email]" class="form-control mb-2" placeholder="email" required>
-					<input type="url" name="newUser[avatar]" class="form-control mb-2" placeholder="avatar url" required>
+					<div class="custom-file mb-2">
+						<input type="file" name="avatar" class="custom-file-input" id="avatar" required accept="image/*">
+						<label class="custom-file-label" for="avatar">Choose Profile Pic</label>
+					</div>
 					<input type="password" name="newUser[code]" class="form-control mb-2" placeholder="Admin Code">
 					<button class="btn btn-primary btn-block mb-2">Sign Up!</button>
 					<a href="/campgrounds">Go Back</a>
@@ -18,4 +21,5 @@
 		</form>
 	</div>
 </div>
+<script src="/js/agency.js"></script>
 <%- include("../partials/footer") %>

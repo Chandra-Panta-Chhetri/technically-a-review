@@ -2,12 +2,15 @@
 <div class="my-3">
 	<h1 class="text-center">Edit Profile</h1>
 	<div class="my-4">
-			<form action="/users/<%= user._id %>?_method=PUT" method="POST">
+			<form action="/users/<%= user._id %>?_method=PUT" method="POST" enctype="multipart/form-data">
 			<div class="form-group row justify-content-center">
 				<div class="col-12 col-md-6 col-lg-5">
-					<input type="text" name="name" class="form-control mb-2" value="<%= user.fullName %>">
-					<input type="email" name="email" class="form-control mb-2" value="<%= user.email %>">
-					<input type="text" name="avatar" class="form-control mb-2" value="<%= user.avatar %>">
+					<input type="text" name="user[fullName]" class="form-control mb-2" value="<%= user.fullName %>">
+					<input type="email" name="user[email]" class="form-control mb-2" value="<%= user.email %>">
+					<div class="custom-file mb-2">
+						<input type="file" name="avatar" class="custom-file-input" id="avatar" accept="image/*">
+						<label class="custom-file-label" for="avatar">Choose New Profile Pic</label>
+					</div>
 					<button class="btn btn-primary btn-block mb-2">Confirm Changes</button>
 					<a href="/campgrounds">Go Back to Campgrounds</a>
 				</div>
@@ -15,4 +18,5 @@
 		</form>
 	</div>
 </div>
+<script src="/js/agency.js"></script>
 <%- include("../partials/footer") %>

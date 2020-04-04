@@ -2,7 +2,10 @@ const mongoose 	    = require("mongoose");
 	  Comment		= require("./comment"),
 	  campSchema 	= new mongoose.Schema({
 			name: {type: String, unique: true, required: true},
-			image: {type: String, required: true},
+			image: {
+				id: {type: String, required: true},
+				url: {type: String, required: true}
+			},
 			description: {type: String, required: true},
 			price: {type: String, required: true},
 			author: 
