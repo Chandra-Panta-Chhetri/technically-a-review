@@ -34,6 +34,7 @@ router.post("/", middleware.isLoggedIn, upload.single('image'), async (req, res)
 		req.body.camp.author = {id: req.user._id, username: req.user.username};
 		req.body.camp.image  = {id: result.public_id, url: result.secure_url};
 		await Camp.create(req.body.camp);
+		req.flash("success", "Campground successfully created!");
 	} catch (e) {
 		req.flash("error", "Cannot create a camp at this time. Please try again later.");
 	}

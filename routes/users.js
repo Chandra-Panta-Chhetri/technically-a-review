@@ -35,7 +35,7 @@ router.put("/:userId", middleware.isLoggedIn, middleware.hasProfileAuth, upload.
 			req.body.user.avatar = {id: result.public_id, url: result.secure_url};
 		}
 		await user.updateOne({$set: req.body.user});
-		req.flash("success", "User info successfully updated!");
+		req.flash("success", "Profile successfully updated!");
 	} catch (e) {
 		req.flash("error", "Cannot update user info at this time. Please try again later.");
 	}
