@@ -6,11 +6,11 @@
 			<div class="form-group row justify-content-center">
 				<div class="col-12 col-md-6 col-lg-5">
 					<label for="fullname">Full Name</label>
-					<input type="text" name="user[fullName]" id="fullname" class="form-control mb-2" value="<%= user.fullName %>">
+					<input type="text" id="fullname" class="form-control mb-2" name="user[fullName]" value="<%= user.fullName %>" required>
 					<label for="email">Email</label>
-					<input type="email" name="user[email]" id="email" class="form-control mb-2" value="<%= user.email %>">
+					<input type="email" id="email" class="form-control mb-2" name="user[email]" value="<%= user.email %>" required>
 					<div class="custom-file mb-2">
-						<input type="file" name="avatar" class="custom-file-input" id="avatar" accept="image/*">
+						<input type="file" id="avatar" class="custom-file-input" name="avatar" accept="image/*">
 						<label class="custom-file-label" for="avatar">Choose New Profile Picture</label>
 					</div>
 					<button class="btn btn-primary btn-block mb-2">Confirm Changes</button>

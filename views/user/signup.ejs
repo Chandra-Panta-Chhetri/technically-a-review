@@ -6,19 +6,19 @@
 			<div class="form-group row justify-content-center">
 				<div class="col-12 col-md-6 col-lg-5">
 					<label for="username">Username</label>
-					<input type="text" name="newUser[username]" id="username" class="form-control mb-2" placeholder="username" required>
+					<input type="text" id="username" class="form-control mb-2" name="newUser[username]" placeholder="username" required>
 					<label for="password">Password</label>
-					<input type="password" name="newUser[password]" id="password" class="form-control mb-2" placeholder="password" required>
+					<input type="password" id="password" class="form-control mb-2" name="newUser[password]" placeholder="password" required pattern=".{8,}" title="8 characters minimum.">
 					<label for="fullName">Full Name</label>
-					<input type="text" name="newUser[fullName]" id="fullName" class="form-control mb-2" placeholder="full name" required>
+					<input type="text" id="fullName" class="form-control mb-2" name="newUser[fullName]" placeholder="full name" required>
 					<label for="email">Email</label>
-					<input type="email" name="newUser[email]" id="email" class="form-control mb-2" placeholder="email" required autocomplete="on">
+					<input type="email" id="email" class="form-control mb-2" name="newUser[email]" placeholder="email" required>
 					<div class="custom-file mb-2">
-						<input type="file" name="avatar" class="custom-file-input" id="avatar" required accept="image/*">
+						<input type="file" id="avatar" class="custom-file-input" name="avatar" required accept="image/*">
 						<label class="custom-file-label" for="avatar">Choose Profile Picture</label>
 					</div>
 					<label for="code">Admin Code</label>
-					<input type="password" name="newUser[code]" id="code" class="form-control mb-2" placeholder="Admin Code">
+					<input type="password" id="code" class="form-control mb-2" name="newUser[code]" placeholder="Admin Code">
 					<button class="btn btn-primary btn-block mb-2">Sign Up!</button>
 					<a href="/campgrounds">Go Back</a>
 				</div>

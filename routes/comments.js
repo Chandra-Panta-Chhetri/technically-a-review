@@ -41,6 +41,7 @@ router.post("/", middleware.isLoggedIn, middleware.hasCommented, async (req, res
 		const campComments = await Comment.find({campId: camp._id});
 		camp.avgRating = calculateAvgRating(campComments);
 		await camp.save();
+		req.flash("success", "Comment successfully added.");
 		return res.redirect(`/campgrounds/${req.params.campId}`);
 	} catch (e) {
 		req.flash("error", "No campground found.");

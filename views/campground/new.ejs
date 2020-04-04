@@ -8,14 +8,14 @@
 					<label for="name">Camp Name</label>
 					<input type="text" id="name" class="form-control mb-2" name="camp[name]" placeholder="camp name" required>
 					<label for="description">Camp Description</label>
-					<input type="text" name="camp[description]" class="form-control mb-2" placeholder="camp description" required>
+					<input type="text" id="description" class="form-control mb-2" name="camp[description]" placeholder="camp description" required>
 					<label for="price">Camp Price</label>
-					<input type="number" name="camp[price]" id="price" class="form-control mb-2" placeholder="camp price" min="0.01" step="0.01" required>
+					<input type="number" id="price" class="form-control mb-2" name="camp[price]" placeholder="camp price" required min="0.01" step="0.01">
 					<div class="custom-file mb-2">
-						<input type="file" name="image" class="custom-file-input" id="image" required accept="image/*">
+						<input type="file" id="image" class="custom-file-input" name="image" required accept="image/*">
 						<label class="custom-file-label" for="image">Choose Camp Picture</label>
 					</div>
-					<button type="submit" class="btn btn-primary btn-block mb-2">Create Campground</button>
+					<button class="btn btn-primary btn-block mb-2">Create Campground</button>
 					<a href="/campgrounds">Go Back</a>
 				</div>
 			</div>

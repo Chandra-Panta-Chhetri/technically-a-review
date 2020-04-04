@@ -6,9 +6,9 @@
 			<div class="form-group row justify-content-center">
 				<div class="col-12 col-md-6 col-lg-5">
 					<label for="newPass">New Password</label>
-					<input type="password" name="password" id="newPass" class="form-control mb-2" placeholder="new password">
+					<input type="password" id="newPass" class="form-control mb-2" name="password" placeholder="new password" required pattern=".{8,}" title="8 characters minimum.">
 					<label for="confirmPass">Confirm New Password</label>
-					<input type="password" name="confirm" id="confirmPass" class="form-control mb-2" placeholder="confirm password">
+					<input type="password" id="confirmPass" class="form-control mb-2" name="confirm" placeholder="confirm password" required pattern=".{8,}" title="8 characters minimum.">
 					<button class="btn btn-primary btn-block mb-2">Change Password</button>
 				</div>
 			</div>

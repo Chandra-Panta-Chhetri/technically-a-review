@@ -6,16 +6,16 @@
 			<div class="form-group row justify-content-center">
 				<div class="col-12 col-md-6 col-lg-5">
 					<label for="name">Camp Name</label>
-					<input type="text" id="name" class="form-control mb-2" name="camp[name]" value="<%= camp.name %>">
+					<input type="text" id="name" class="form-control mb-2" name="camp[name]" value="<%= camp.name %>" required>
 					<label for="description">Camp Description</label>
-					<input type="text" name="camp[description]" id="description" class="form-control mb-2" value="<%= camp.description %>">
+					<input type="text" id="description" class="form-control mb-2" name="camp[description]" value="<%= camp.description %>" required>
 					<label for="price">Camp Price</label>
-					<input type="number" name="camp[price]" id="price" class="form-control mb-2" value="<%= camp.price %>" min="0.01" step="0.01">
+					<input type="number" id="price" class="form-control mb-2" name="camp[price]" value="<%= camp.price %>" required min="0.01" step="0.01">
 					<div class="custom-file mb-2">
-						<input type="file" name="image" class="custom-file-input" id="image" accept="image/*">
+						<input type="file" id="image" class="custom-file-input" name="image" accept="image/*">
 						<label class="custom-file-label" for="image">Choose New Camp Picture</label>
 					</div>
-					<button type="submit" class="btn btn-primary btn-block mb-2">Submit Changes</button>
+					<button class="btn btn-primary btn-block mb-2">Submit Changes</button>
 					<a href="/campgrounds/<%= camp._id %>">Go Back</a>
 				</div>
 			</div>

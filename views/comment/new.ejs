@@ -6,9 +6,9 @@
 			<div class="form-group row justify-content-center">
 				<div class="col-12 col-md-6 col-lg-5">
 					<label for="rating">Rating</label>
-					<input type="number" name="comment[rating]" id="rating" class="form-control mb-2" placeholder="rating (out of 5)" min="1" max="5" step="1">
+					<input type="number" id="rating" class="form-control mb-2" name="comment[rating]" placeholder="rating (out of 5)" required min="1" max="5" step="1">
 					<label for="comment">Comment</label>
-					<input type="text" name="comment[content]" id="comment" class="form-control mb-2" placeholder="comment">
+					<input type="text" id="comment" class="form-control mb-2" name="comment[content]" placeholder="comment" required>
 					<button class="btn btn-primary btn-block mb-2">Post Comment</button>
 					<a href="/campgrounds/<%= camp._id %>">Go Back</a>
 				</div>
