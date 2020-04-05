@@ -28,7 +28,7 @@ app.use(express.static(`${__dirname}/public`));
 app.use(flash());
 app.set("view engine", "ejs");
 
-app.use(require('express-session')({ secret: 'OnePlus7', resave: false, saveUninitialized: false }));
+app.use(require('express-session')({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(methodOverride("_method"));

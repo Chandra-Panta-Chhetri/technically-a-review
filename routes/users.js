@@ -15,8 +15,8 @@ router.post("/", upload.single('avatar'), async (req, res) => {
 		const result = await cloudinary.v2.uploader.upload(req.file.path);
 		req.body.newUser.avatar = {id: result.public_id, url: result.secure_url};
 		const user = await User.register(req.body.newUser, userPassword);
-		req.logIn(user, (err) => {
-			req.flash("success", `Welcome to Yelp Camp ${user.username}!`);
+		req.login(user, (err) => {
+			req.flash("success", `Welcome to Yelp Camp ${user.name}!`);
 			return res.redirect("/campgrounds");
 		});
 	} catch (e) {
@@ -51,12 +51,19 @@ router.get("/:userId/edit", middleware.isLoggedIn, middleware.hasProfileAuth, as
 router.put("/:userId", middleware.isLoggedIn, middleware.hasProfileAuth, upload.single('avatar'), async (req, res) => {
 	try {
 		const user = await User.findById(req.params.userId);
+		var   hasChangedEmail;
+		req.body.user.email = req.body.user.email.toLowerCase();
 		if(req.file){
 			cloudinary.v2.uploader.destroy(user.avatar.id);
 			const result = await cloudinary.v2.uploader.upload(req.file.path);
 			req.body.user.avatar = {id: result.public_id, url: result.secure_url};
 		}
+		user.email !== req.body.user.email ? hasChangedEmail = true : hasChangedEmail = false;
 		await user.updateOne({$set: req.body.user});
+		if(hasChangedEmail){
+			req.flash("success", "Profile successfully updated! Please sign in again for security reasons.");
+			return res.redirect(`/login`);
+		}
 		req.flash("success", "Profile successfully updated!");
 	} catch (e) {
 		req.flash("error", "Cannot update user info at this time. Please try again later.");
@@ -91,7 +98,7 @@ router.post("/:userId/changePassword", middleware.isLoggedIn, middleware.hasProf
 					req.flash("error", "The current password you entered was wrong.");
 					return res.redirect(`/users/${req.params.userId}/changePassword`);
 				}
-				req.flash("success", "Password has been succesfully changed");
+				req.flash("success", "Password has been succesfully changed.");
 				return res.redirect(`/users/${req.params.userId}`);
 			});
 		}

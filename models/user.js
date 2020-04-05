@@ -3,10 +3,9 @@ const mongoose 			    = require("mongoose"),
 	  Comment				= require("./comment"),
 	  passportLocalMongoose = require("passport-local-mongoose"),
 	  userSchema 			= new mongoose.Schema({
-		username: {type: String, unique: true, required: true},
-		password: String,
-		fullName: {type: String, required: true},
 		email: {type: String, unique: true, required: true},
+		password: String,
+		name: {type: String, required: true},
 		avatar: {
 			id: {type: String, required: true},
 			url: {type: String, required: true}
@@ -16,8 +15,7 @@ const mongoose 			    = require("mongoose"),
 		isAdmin: {type: Boolean, default: false}
 	  });
 
-userSchema.plugin(passportLocalMongoose);
-
+userSchema.plugin(passportLocalMongoose, {usernameField: 'email', usernameLowerCase: true});
 userSchema.pre("remove", async function(next) {
 	await Comment.deleteMany({"author.id": this._id});
 	await Camp.deleteMany({"author.id": this._id});

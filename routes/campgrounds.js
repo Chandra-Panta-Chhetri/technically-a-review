@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
 	try {
 		if(req.query.search){
 			const regex = new RegExp(escapeRegex(req.query.search), 'gi');
-			camps = await Camp.find({$or: [{name: regex}, {"author.username": regex}]});
+			camps = await Camp.find({$or: [{name: regex}, {"author.name": regex}]});
 			return res.render("campground/index", {camps, page: 'campgrounds', searched: true});
 		}
 		camps = await Camp.find({});
@@ -31,7 +31,7 @@ router.get("/new", middleware.isLoggedIn, (req, res) => res.render("campground/n
 router.post("/", middleware.isLoggedIn, upload.single('image'), async (req, res) => {
 	try {
 		const result = await cloudinary.v2.uploader.upload(req.file.path);
-		req.body.camp.author = {id: req.user._id, username: req.user.username};
+		req.body.camp.author = {id: req.user._id, name: req.user.name};
 		req.body.camp.image  = {id: result.public_id, url: result.secure_url};
 		await Camp.create(req.body.camp);
 		req.flash("success", "Campground successfully created!");

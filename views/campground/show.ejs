@@ -20,7 +20,7 @@
 						</strong>
 					</h5>
 					<p class="mt-4 mt-sm-3"><%= camp.description %></p>
-					<p>Created by: <a href="/users/<%= camp.author.id %>"><%= camp.author.username %></a></p>
+					<p>Created by: <a href="/users/<%= camp.author.id %>"><%= camp.author.name %></a></p>
 					<p>Updated: <%= moment(camp.updatedAt).fromNow() %></p>
 					<% if(currentUser && (camp.author.id.equals(currentUser._id) || currentUser.isAdmin)){ %>
 						<a class="btn btn-xs btn-warning" href="/campgrounds/<%= camp._id %>/edit">Edit</a>
@@ -62,7 +62,7 @@
 						<% } %>
 						<span class="float-right ml-2 ml-sm-0">Posted: <%= moment(comment.createdAt).fromNow() %></span>
 						<br>
-						<strong><a href="/users/<%= camp.author.id %>"><%= comment.author.username %></a></strong>
+						<strong><a href="/users/<%= camp.author.id %>"><%= comment.author.name %></a></strong>
 					</p>
 					<p><%= comment.content %></p>
 					<% if(currentUser && currentUser.isAdmin) { %>

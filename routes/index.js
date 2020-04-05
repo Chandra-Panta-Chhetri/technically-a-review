@@ -4,13 +4,14 @@ const express 	 = require("express"),
 	  User		 = require("../models/user"),
 	  asyncPack	 = require("async"),
 	  nodemailer = require("nodemailer"),
-	  crypto	 = require("crypto");
+	  crypto	 = require("crypto"),
+	  middleware = require("../middleware/index");
 
 router.get("/login", (req, res) => res.render("user/login", {page: 'login'}));
 
-router.post("/login", passport.authenticate('local', { failureRedirect: '/login', failureFlash: "Incorrect username or password."}),
+router.post("/login", middleware.lowercaseUsername, passport.authenticate('local', { failureRedirect: '/login', failureFlash: "Incorrect email or password."}),
   (req, res) => {
-	req.flash("success", `Welcome back ${req.user.username}!`);
+	req.flash("success", `Welcome back ${req.user.name}!`);
 	return res.redirect("/campgrounds");
 });
 
@@ -33,9 +34,9 @@ router.post("/forgot", (req, res) => {
 			});
 		},
 		(token, done) => {
-		 	User.findOne({username: req.body.username, email: req.body.email}, (err, user) => {
+		 	User.findOne({email: req.body.email.toLowerCase()}, (err, user) => {
 				if(err || !user){
-					req.flash("success", `To reset your password, please follow the instructions sent to ${req.body.email}`);
+					req.flash("success", `To reset your password, please follow the instructions sent to ${req.body.email.toLowerCase()}`);
 					return res.redirect("/forgot");
 				}
 				user.resetPasswordToken = token;
@@ -53,7 +54,7 @@ router.post("/forgot", (req, res) => {
 					pass: process.env.GMAILPW
 				}
 			});
-			var mailContent = `You or someone requested a password change for the user with username: ${user.username}.\nPlease click on the link below to reset your password:\nhttp://${req.headers.host}/reset/${token}\nNote: This link will expire in 15 mins.`;
+			var mailContent = `You or someone requested a password change for the user with username: ${user.email}.\nPlease click on the link below to reset your password:\nhttp://${req.headers.host}/reset/${token}\nNote: This link will expire in 15 mins.`;
 			var mailOptions = {
 				to: user.email,
 				from: 'infonodeapp@gmail.com',
@@ -91,7 +92,7 @@ router.post("/reset/:token", (req, res) => {
 					user.resetPasswordToken = undefined;
 					user.resetPasswordExpires = undefined;
 					user.save((err) => {
-						req.logIn(user, (err) =>{
+						req.login(user, (err) =>{
 							done(err, user);
 						});
 					});

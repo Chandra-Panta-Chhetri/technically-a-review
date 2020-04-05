@@ -69,5 +69,10 @@ middleware.hasProfileAuth = async (req, res, next) => {
 			return res.redirect("/campgrounds");
 		}
 }
+
+middleware.lowercaseUsername = (req, res, next) => {
+	req.body.username = req.body.username.toLowerCase();
+	next();
+}
 	
 module.exports = middleware;

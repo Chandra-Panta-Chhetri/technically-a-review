@@ -35,7 +35,7 @@ router.post("/", middleware.isLoggedIn, middleware.hasCommented, async (req, res
 			throw new Error();
 		}
 		req.body.comment.campId = camp._id;
-		req.body.comment.author = {id: req.user._id, username: req.user.username};
+		req.body.comment.author = {id: req.user._id, name: req.user.name};
 		await Comment.create(req.body.comment);
 		const campComments = await Comment.find({campId: camp._id});
 		camp.avgRating = calculateAvgRating(campComments);
