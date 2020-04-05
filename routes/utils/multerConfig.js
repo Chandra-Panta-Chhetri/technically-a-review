@@ -5,7 +5,7 @@ const multer     = require("multer"),
 		  }
 	  }),
 	  upload     = multer({
-		limits: {fileSize: 3000000},
+		limits: {fileSize: 2000000},
 		fileFilter(req, file, cb){
 			const regex = new RegExp("\.(png|jpg|jpeg)");
 			if(!regex.test(file.originalname)){
