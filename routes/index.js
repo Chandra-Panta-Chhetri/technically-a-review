@@ -4,9 +4,7 @@ const express 	 = require("express"),
 	  User		 = require("../models/user"),
 	  asyncPack	 = require("async"),
 	  nodemailer = require("nodemailer"),
-	  crypto	 = require("crypto"),
-	  cloudinary = require('./utils/cloudinaryConfig'),
-	  upload     = require('./utils/multerConfig');
+	  crypto	 = require("crypto");
 
 router.get("/login", (req, res) => res.render("user/login", {page: 'login'}));
 
@@ -17,28 +15,6 @@ router.post("/login", passport.authenticate('local', { failureRedirect: '/login'
 });
 
 router.get("/signup", (req, res) => res.render("user/signup", {page: 'signup'}));
-
-router.post("/signup", upload.single('avatar'), async (req, res) => {
-	try {
-		const userPassword = req.body.newUser.password;
-		req.body.newUser.isAdmin = req.body.newUser.code === process.env.ADMINCODE;
-		delete req.body.newUser.code;
-		delete req.body.newUser.password;
-		const result = await cloudinary.v2.uploader.upload(req.file.path);
-		req.body.newUser.avatar = {id: result.public_id, url: result.secure_url};
-		const user = await User.register(req.body.newUser, userPassword);
-		req.logIn(user, (err) => {
-			req.flash("success", `Welcome to Yelp Camp ${user.username}!`);
-			return res.redirect("/campgrounds");
-		});
-	} catch (e) {
-		req.flash("error", e.message);
-		return res.redirect("/signup");
-	}
-}, (err, req, res, next) => {
-	req.flash("error", err);
-	res.redirect("/signup");
-});
 
 router.get("/logout", (req, res) => {
 	req.logout();

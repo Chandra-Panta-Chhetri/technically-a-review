@@ -6,6 +6,28 @@ const express 	 = require("express"),
 	  cloudinary = require('./utils/cloudinaryConfig'),
 	  upload     = require('./utils/multerConfig');
 
+router.post("/", upload.single('avatar'), async (req, res) => {
+	try {
+		const userPassword = req.body.newUser.password;
+		req.body.newUser.isAdmin = req.body.newUser.code === process.env.ADMINCODE;
+		delete req.body.newUser.code;
+		delete req.body.newUser.password;
+		const result = await cloudinary.v2.uploader.upload(req.file.path);
+		req.body.newUser.avatar = {id: result.public_id, url: result.secure_url};
+		const user = await User.register(req.body.newUser, userPassword);
+		req.logIn(user, (err) => {
+			req.flash("success", `Welcome to Yelp Camp ${user.username}!`);
+			return res.redirect("/campgrounds");
+		});
+	} catch (e) {
+		req.flash("error", e.message);
+		return res.redirect("/signup");
+	}
+}, (err, req, res, next) => {
+	req.flash("error", err);
+	res.redirect("/signup");
+});
+
 router.get("/:userId", async (req, res) => {
 	try {
 		const user = await User.findById(req.params.userId);
