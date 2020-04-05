@@ -141,7 +141,7 @@ router.post("/reset/:token", (req, res) => {
 				text: 'This is a confirmation email to inform you that your password has been successfully changed!'
 			};
 			smtpTransport.sendMail(mailOptions, function(err){
-				req.flash("success", "Your Password has been changed successfully");
+				req.flash("success", "Password changed successfully!");
 				done(err);
 			});
 		}

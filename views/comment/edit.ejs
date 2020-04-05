@@ -8,7 +8,7 @@
 					<label for="rating">Rating</label>
 					<input type="number" id="rating" class="form-control mb-2" name="comment[rating]" value="<%= comment.rating %>" required min="0" max="5" step="1">
 					<label for="comment">Comment</label>
-					<input type="text" id="comment" class="form-control mb-2" name="comment[content]" value="<%= comment.content %>" required>
+					<input type="text" id="comment" class="form-control mb-3" name="comment[content]" value="<%= comment.content %>" required>
 					<button class="btn btn-primary btn-block mb-2">Submit Changes</button>
 					<a href="/campgrounds/<%= campId %>">Go Back</a>
 				</div>

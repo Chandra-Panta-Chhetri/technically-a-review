@@ -52,3 +52,13 @@ h1 + img{
 ul{
 	list-style: none;
 }
+
+.input-group-append > a{
+	background: #F0F0F0;
+	border: 0.7px solid #ced4da;
+	border-left: none;
+}
+
+.input-group-append > a:hover {
+	background: inherit;
+}
