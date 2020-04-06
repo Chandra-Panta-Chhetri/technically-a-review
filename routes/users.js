@@ -4,16 +4,22 @@ const express 	 = require("express"),
       User       = require("../models/user"),
 	  middleware = require("../middleware/index"),
 	  cloudinary = require('./utils/cloudinaryConfig'),
-	  upload     = require('./utils/multerConfig');
+	  upload     = require('./utils/multerConfig'),
+	  mongoose   = require('mongoose');
 
 router.post("/", upload.single('avatar'), async (req, res) => {
 	try {
+		const userId = new mongoose.Types.ObjectId;
 		const userPassword = req.body.newUser.password;
 		req.body.newUser.isAdmin = req.body.newUser.code === process.env.ADMINCODE;
 		delete req.body.newUser.code;
 		delete req.body.newUser.password;
-		const result = await cloudinary.v2.uploader.upload(req.file.path);
-		req.body.newUser.avatar = {id: result.public_id, url: result.secure_url};
+		req.body.newUser._id = userId;
+		const result = await cloudinary.uploader.upload(req.file.path, {
+			public_id: userId, 
+			eager: [{width: 350, height: 250, crop: "scale", quality: "100"}]
+		});
+		req.body.newUser.avatarUrl = result.eager[0].secure_url;
 		const user = await User.register(req.body.newUser, userPassword);
 		req.login(user, (err) => {
 			req.flash("success", `Welcome to Yelp Camp ${user.name}!`);
@@ -54,9 +60,12 @@ router.put("/:userId", middleware.isLoggedIn, middleware.hasProfileAuth, upload.
 		var   hasChangedEmail;
 		req.body.user.email = req.body.user.email.toLowerCase();
 		if(req.file){
-			cloudinary.v2.uploader.destroy(user.avatar.id);
-			const result = await cloudinary.v2.uploader.upload(req.file.path);
-			req.body.user.avatar = {id: result.public_id, url: result.secure_url};
+			cloudinary.uploader.destroy(user._id);
+			const result = await cloudinary.uploader.upload(req.file.path, {
+				public_id: user._id, 
+				eager: [{width: 350, height: 250, crop: "scale", quality: "100"}]
+			});
+			req.body.user.avatarUrl = result.eager[0].secure_url;
 		}
 		user.email !== req.body.user.email ? hasChangedEmail = true : hasChangedEmail = false;
 		await user.updateOne({$set: req.body.user});
@@ -77,7 +86,7 @@ router.put("/:userId", middleware.isLoggedIn, middleware.hasProfileAuth, upload.
 router.delete("/:userId", middleware.isLoggedIn, middleware.hasProfileAuth, async(req, res) => {
 	try {
 		const user = await User.findById(req.params.userId);
-		cloudinary.v2.uploader.destroy(user.avatar.id);
+		cloudinary.uploader.destroy(user._id);
 		user.remove();
 		req.flash("success", "Account has been closed successfully!");
 		return res.redirect("/campgrounds");

@@ -2,18 +2,8 @@ const express 	  = require("express"),
 	  router 	  = express.Router({mergeParams: true}),
 	  Camp   	  = require("../models/camp"),
 	  Comment     = require("../models/comment"),
-	  middleware  = require("../middleware/index");
-
-function calculateAvgRating(comments){
-	if(!comments.length){
-		return 0;
-	}
-	var totalRating = 0;
-	comments.forEach((comment) => {
-		totalRating += comment.rating;
-	});
-	return Math.ceil(totalRating / comments.length);
-}
+	  middleware  = require("../middleware/index"),
+	  helper      = require("./helpers/index");
 
 router.get("/new", middleware.isLoggedIn, middleware.hasCommented, async (req, res) => {
 	try {
@@ -38,7 +28,7 @@ router.post("/", middleware.isLoggedIn, middleware.hasCommented, async (req, res
 		req.body.comment.author = {id: req.user._id, name: req.user.name};
 		await Comment.create(req.body.comment);
 		const campComments = await Comment.find({campId: camp._id});
-		camp.avgRating = calculateAvgRating(campComments);
+		camp.avgRating = helper.calculateAvgRating(campComments);
 		await camp.save();
 		req.flash("success", "Comment successfully added.");
 		return res.redirect(`/campgrounds/${req.params.campId}`);
@@ -61,7 +51,7 @@ router.put("/:commentId", middleware.isLoggedIn, middleware.hasCommentAuth, asyn
 		if(!campComments.length || !camp){
 			throw new Error();
 		}
-		camp.avgRating = calculateAvgRating(campComments);
+		camp.avgRating = helper.calculateAvgRating(campComments);
 		await camp.save();
 		req.flash("success", "Comment successfully updated!");
 		return res.redirect(`/campgrounds/${req.params.campId}`);
@@ -79,7 +69,7 @@ router.delete("/:commentId", middleware.isLoggedIn, middleware.hasCommentAuth, a
 		if(!camp){
 			throw new Error();
 		}
-		camp.avgRating = calculateAvgRating(campComments);
+		camp.avgRating = helper.calculateAvgRating(campComments);
 		await camp.save();
 		req.flash("success", "Comment was successfully deleted!");
 	} catch (e) {

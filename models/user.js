@@ -6,10 +6,7 @@ const mongoose 			    = require("mongoose"),
 		email: {type: String, unique: true, required: true},
 		password: String,
 		name: {type: String, required: true},
-		avatar: {
-			id: {type: String, required: true},
-			url: {type: String, required: true}
-		},
+		avatarUrl: {type: String, required: true},
 		resetPasswordToken: String,
 		resetPasswordExpires: Date,
 		isAdmin: {type: Boolean, default: false}

@@ -4,7 +4,8 @@ const express 	 = require("express"),
 	  Comment    = require("../models/comment"),
 	  middleware = require("../middleware/index"),
 	  cloudinary = require('./utils/cloudinaryConfig'),
-	  upload     = require('./utils/multerConfig');
+	  upload     = require('./utils/multerConfig'),
+	  mongoose   = require('mongoose');
 
 const escapeRegex = (text) => text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 
@@ -17,7 +18,7 @@ router.get("/", async (req, res) => {
 			return res.render("campground/index", {camps, page: 'campgrounds', searched: true});
 		}
 		camps = await Camp.find({});
-		for(const camp of camps){
+		for(let camp of camps){
 			await camp.populate("comments").execPopulate();
 		}
 		return res.render("campground/index", {camps, page: 'campgrounds', searched: false});
@@ -30,9 +31,14 @@ router.get("/new", middleware.isLoggedIn, (req, res) => res.render("campground/n
 
 router.post("/", middleware.isLoggedIn, upload.single('image'), async (req, res) => {
 	try {
-		const result = await cloudinary.v2.uploader.upload(req.file.path);
+		const campId = new mongoose.Types.ObjectId;
+		const result = await cloudinary.uploader.upload(req.file.path, {
+			public_id: campId, 
+			eager: [{width: 350, height: 250, crop: "scale", quality: "100"}]
+		});
 		req.body.camp.author = {id: req.user._id, name: req.user.name};
-		req.body.camp.image  = {id: result.public_id, url: result.secure_url};
+		req.body.camp.imageUrl  = result.eager[0].secure_url;
+		req.body.camp._id = campId;
 		await Camp.create(req.body.camp);
 		req.flash("success", "Campground successfully created!");
 	} catch (e) {
@@ -71,9 +77,12 @@ router.put("/:campId", middleware.isLoggedIn, middleware.hasCampAuth, upload.sin
 	try {
 		const camp = await Camp.findById(req.params.campId);
 		if(req.file){
-			cloudinary.v2.uploader.destroy(camp.image.id);
-			const result = await cloudinary.v2.uploader.upload(req.file.path);
-			req.body.camp.image  = {id: result.public_id, url: result.secure_url};
+			cloudinary.uploader.destroy(camp._id);
+			const result = await cloudinary.uploader.upload(req.file.path, {
+				public_id: camp._id, 
+				eager: [{width: 350, height: 250, crop: "scale", quality: "100"}]
+			});
+			req.body.camp.imageUrl  = result.eager[0].secure_url;
 		}
 		await camp.updateOne({$set: req.body.camp});
 		req.flash("success", "Camp Successfully Updated!");
@@ -90,7 +99,7 @@ router.put("/:campId", middleware.isLoggedIn, middleware.hasCampAuth, upload.sin
 router.delete("/:campId", middleware.isLoggedIn, middleware.hasCampAuth, async (req, res) => {
 	try {
 		const camp = await Camp.findById(req.params.campId);
-		cloudinary.v2.uploader.destroy(camp.image.id);
+		cloudinary.uploader.destroy(camp._id);
 		camp.remove();
 		req.flash("success", "Campground deleted successfully!");
 		return res.redirect("/campgrounds");
