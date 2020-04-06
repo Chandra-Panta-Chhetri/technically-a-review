@@ -70,8 +70,8 @@ middleware.hasProfileAuth = async (req, res, next) => {
 		}
 }
 
-middleware.lowercaseUsername = (req, res, next) => {
-	req.body.username = req.body.username.toLowerCase();
+middleware.lowercaseEmail = (req, res, next) => {
+	req.body.email = req.body.email.toLowerCase();
 	next();
 }
 	

@@ -9,7 +9,7 @@ const express 	 = require("express"),
 
 router.get("/login", (req, res) => res.render("user/login", {page: 'login'}));
 
-router.post("/login", middleware.lowercaseUsername, passport.authenticate('local', { failureRedirect: '/login', failureFlash: "Incorrect email or password."}),
+router.post("/login", middleware.lowercaseEmail, passport.authenticate('local', { failureRedirect: '/login', failureFlash: "Incorrect email or password."}),
   (req, res) => {
 	req.flash("success", `Welcome back ${req.user.name}!`);
 	return res.redirect("/campgrounds");

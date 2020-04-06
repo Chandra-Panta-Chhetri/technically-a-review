@@ -2,7 +2,15 @@ const mongoose 	    = require("mongoose");
 	  Comment		= require("./comment"),
 	  campSchema 	= new mongoose.Schema({
 			name: {type: String, unique: true, required: true},
-			imageUrl: {type: String, required: true},
+			imageUrl: {
+				type: String, 
+				required: true,
+				validate(value){
+					if(!value.toLowerCase().includes("cloudinary")){
+						throw new Error("Invalid image url");
+					}
+				}
+			},
 			description: {type: String, required: true},
 			price: {type: String, required: true},
 			author: 
