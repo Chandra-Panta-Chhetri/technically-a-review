@@ -5,15 +5,14 @@ const express = require('express'),
 	middleware = require('../middleware/index'),
 	cloudinary = require('./utils/cloudinaryConfig'),
 	upload = require('./utils/multerConfig'),
-	mongoose = require('mongoose');
-
-const escapeRegex = (text) => text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+	mongoose = require('mongoose'),
+	helper = require('./helpers/index');
 
 router.get('/', async (req, res) => {
 	var camps;
 	try {
 		if (req.query.search) {
-			const regex = new RegExp(escapeRegex(req.query.search), 'gi');
+			const regex = new RegExp(helper.escapeRegex(req.query.search), 'gi');
 			camps = await Camp.find({ $or: [ { name: regex }, { 'author.name': regex } ] });
 			return res.render('campground/index', { camps, page: 'campgrounds', searched: true });
 		}
