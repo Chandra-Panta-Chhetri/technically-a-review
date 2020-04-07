@@ -24,7 +24,7 @@ router.post(
 			});
 			req.body.newUser.avatarUrl = result.eager[0].secure_url;
 			const user = await User.register(req.body.newUser, userPassword);
-			req.login(user, (err) => {
+			req.login(user, () => {
 				req.flash('success', `Welcome to Yelp Camp ${user.name}!`);
 				return res.redirect('/campgrounds');
 			});
@@ -55,7 +55,6 @@ router.get('/:userId', async (req, res) => {
 
 router.get('/:userId/edit', middleware.isLoggedIn, middleware.hasProfileAuth, async (req, res) => {
 	const user = await User.findById(req.params.userId);
-	var hi;
 	return res.render('user/edit', { user });
 });
 

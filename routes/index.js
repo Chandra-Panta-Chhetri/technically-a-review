@@ -2,10 +2,10 @@ const express = require('express'),
 	router = express.Router(),
 	passport = require('passport'),
 	User = require('../models/user'),
-	asyncPack = require('async'),
+	Async = require('async'),
 	nodemailer = require('nodemailer'),
-	crypto = require('crypto'),
-	middleware = require('../middleware/index');
+	middleware = require('../middleware/index'),
+	helper = require('./helpers/index');
 
 router.get('/login', (req, res) => res.render('user/login', { page: 'login' }));
 
@@ -30,7 +30,7 @@ router.get('/logout', (req, res) => {
 router.get('/forgot', (req, res) => res.render('user/forgot'));
 
 router.post('/forgot', (req, res) => {
-	asyncPack.waterfall(
+	Async.waterfall(
 		[
 			(done) => {
 				crypto.randomBytes(20, (err, buf) => {
@@ -83,6 +83,13 @@ router.post('/forgot', (req, res) => {
 	);
 });
 
+function generateResetToken (cb) {
+	crypto.randomBytes(20, (err, buf) => {
+		var token = buf.toString('hex');
+		cb(err, token);
+	});
+}
+
 router.get('/reset/:token', async (req, res) => {
 	try {
 		await User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } });
@@ -94,7 +101,7 @@ router.get('/reset/:token', async (req, res) => {
 });
 
 router.post('/reset/:token', (req, res) => {
-	asyncPack.waterfall(
+	Async.waterfall(
 		[
 			(done) => {
 				User.findOne(
