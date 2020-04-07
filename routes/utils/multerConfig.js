@@ -1,5 +1,5 @@
-const multer     = require("multer"),
-	  storage    = multer.diskStorage({
+const multer  = require("multer"),
+      storage = multer.diskStorage({
 		  filename(req, file, cb){
 			  cb(null, Date.now() + file.originalname);
 		  }

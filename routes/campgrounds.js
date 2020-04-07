@@ -1,19 +1,19 @@
-const express = require('express'),
-	router = express.Router(),
-	Camp = require('../models/camp'),
-	Comment = require('../models/comment'),
-	middleware = require('../middleware/index'),
-	cloudinary = require('./utils/cloudinaryConfig'),
-	upload = require('./utils/multerConfig'),
-	mongoose = require('mongoose'),
-	helper = require('./helpers/index');
+const express    = require('express'),
+      router     = express.Router(),
+      Camp       = require('../models/camp'),
+      Comment    = require('../models/comment'),
+      middleware = require('../middleware/index'),
+      cloudinary = require('./utils/cloudinaryConfig'),
+      upload     = require('./utils/multerConfig'),
+      mongoose   = require('mongoose'),
+      helper     = require('./helpers/index');
 
 router.get('/', async (req, res) => {
 	var camps;
 	try {
 		if (req.query.search) {
 			const regex = new RegExp(helper.escapeRegex(req.query.search), 'gi');
-			camps = await Camp.find({ $or: [ { name: regex }, { 'author.name': regex } ] });
+			      camps = await Camp.find({ $or: [ { name: regex }, { 'author.name': regex } ] });
 			return res.render('campground/index', { camps, page: 'campgrounds', searched: true });
 		}
 		camps = await Camp.find({});
@@ -36,12 +36,12 @@ router.post(
 		try {
 			const campId = new mongoose.Types.ObjectId();
 			const result = await cloudinary.uploader.upload(req.file.path, {
-				public_id : campId,
-				eager     : [ { width: 350, height: 250, crop: 'scale', quality: '100' } ]
+				public_id: campId,
+				eager    : [ { width: 350, height: 250, crop: 'scale', quality: '100' } ]
 			});
-			req.body.camp.author = { id: req.user._id, name: req.user.name };
+			req.body.camp.author   = { id: req.user._id, name: req.user.name };
 			req.body.camp.imageUrl = result.eager[0].secure_url;
-			req.body.camp._id = campId;
+			req.body.camp._id      = campId;
 			await Camp.create(req.body.camp);
 			req.flash('success', 'Campground successfully created!');
 		} catch (e) {
@@ -58,7 +58,7 @@ router.post(
 router.get('/:campId', async (req, res) => {
 	try {
 		const comments = await Comment.find({ campId: req.params.campId });
-		const camp = await Camp.findById(req.params.campId);
+		const camp     = await Camp.findById(req.params.campId);
 		if (!camp) {
 			throw new Error();
 		}
@@ -89,8 +89,8 @@ router.put(
 			if (req.file) {
 				cloudinary.uploader.destroy(camp._id);
 				const result = await cloudinary.uploader.upload(req.file.path, {
-					public_id : camp._id,
-					eager     : [ { width: 350, height: 250, crop: 'scale', quality: '100' } ]
+					public_id: camp._id,
+					eager    : [ { width: 350, height: 250, crop: 'scale', quality: '100' } ]
 				});
 				req.body.camp.imageUrl = result.eager[0].secure_url;
 			}

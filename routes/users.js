@@ -1,29 +1,29 @@
-const express = require('express'),
-	router = express.Router(),
-	Camp = require('../models/camp'),
-	User = require('../models/user'),
-	middleware = require('../middleware/index'),
-	cloudinary = require('./utils/cloudinaryConfig'),
-	upload = require('./utils/multerConfig'),
-	mongoose = require('mongoose');
+const express    = require('express'),
+      router     = express.Router(),
+      Camp       = require('../models/camp'),
+      User       = require('../models/user'),
+      middleware = require('../middleware/index'),
+      cloudinary = require('./utils/cloudinaryConfig'),
+      upload     = require('./utils/multerConfig'),
+      mongoose   = require('mongoose');
 
 router.post(
 	'/',
 	upload.single('avatar'),
 	async (req, res) => {
 		try {
-			const userId = new mongoose.Types.ObjectId();
-			const userPassword = req.body.newUser.password;
-			req.body.newUser.isAdmin = req.body.newUser.code === process.env.ADMINCODE;
+			const userId                   = new mongoose.Types.ObjectId();
+			const userPassword             = req.body.newUser.password;
+			      req.body.newUser.isAdmin = req.body.newUser.code === process.env.ADMINCODE;
 			delete req.body.newUser.code;
 			delete req.body.newUser.password;
-			req.body.newUser._id = userId;
-			const result = await cloudinary.uploader.upload(req.file.path, {
-				public_id : userId,
-				eager     : [ { width: 350, height: 250, crop: 'scale', quality: '100' } ]
+			      req.body.newUser._id = userId;
+			const result               = await cloudinary.uploader.upload(req.file.path, {
+				public_id: userId,
+				eager    : [ { width: 350, height: 250, crop: 'scale', quality: '100' } ]
 			});
-			req.body.newUser.avatarUrl = result.eager[0].secure_url;
-			const user = await User.register(req.body.newUser, userPassword);
+			      req.body.newUser.avatarUrl = result.eager[0].secure_url;
+			const user                       = await User.register(req.body.newUser, userPassword);
 			req.login(user, () => {
 				req.flash('success', `Welcome to Yelp Camp ${user.name}!`);
 				return res.redirect('/campgrounds');
@@ -71,8 +71,8 @@ router.put(
 			if (req.file) {
 				cloudinary.uploader.destroy(user._id);
 				const result = await cloudinary.uploader.upload(req.file.path, {
-					public_id : user._id,
-					eager     : [ { width: 350, height: 250, crop: 'scale', quality: '100' } ]
+					public_id: user._id,
+					eager    : [ { width: 350, height: 250, crop: 'scale', quality: '100' } ]
 				});
 				req.body.user.avatarUrl = result.eager[0].secure_url;
 			}

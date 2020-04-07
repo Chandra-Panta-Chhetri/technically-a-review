@@ -1,7 +1,7 @@
 const middleware = {},
-	Camp = require('../models/camp'),
-	Comment = require('../models/comment'),
-	User = require('../models/user');
+      Camp       = require('../models/camp'),
+      Comment    = require('../models/comment'),
+      User       = require('../models/user');
 
 middleware.isLoggedIn = (req, res, next) => {
 	if (req.isAuthenticated()) {

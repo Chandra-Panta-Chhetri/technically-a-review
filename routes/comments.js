@@ -1,9 +1,9 @@
-const express = require('express'),
-	router = express.Router({ mergeParams: true }),
-	Camp = require('../models/camp'),
-	Comment = require('../models/comment'),
-	middleware = require('../middleware/index'),
-	helper = require('./helpers/index');
+const express    = require('express'),
+      router     = express.Router({ mergeParams: true }),
+      Camp       = require('../models/camp'),
+      Comment    = require('../models/comment'),
+      middleware = require('../middleware/index'),
+      helper     = require('./helpers/index');
 
 router.get('/new', middleware.isLoggedIn, middleware.hasCommented, async (req, res) => {
 	try {
@@ -27,8 +27,8 @@ router.post('/', middleware.isLoggedIn, middleware.hasCommented, async (req, res
 		req.body.comment.campId = camp._id;
 		req.body.comment.author = { id: req.user._id, name: req.user.name };
 		await Comment.create(req.body.comment);
-		const campComments = await Comment.find({ campId: camp._id });
-		camp.avgRating = helper.calculateAvgRating(campComments);
+		const campComments   = await Comment.find({ campId: camp._id });
+		      camp.avgRating = helper.calculateAvgRating(campComments);
 		await camp.save();
 		req.flash('success', 'Comment successfully added.');
 		return res.redirect(`/campgrounds/${req.params.campId}`);
@@ -46,8 +46,8 @@ router.get('/:commentId/edit', middleware.isLoggedIn, middleware.hasCommentAuth,
 router.put('/:commentId', middleware.isLoggedIn, middleware.hasCommentAuth, async (req, res) => {
 	try {
 		await Comment.findByIdAndUpdate(req.params.commentId, req.body.comment);
-		const camp = await Camp.findById(req.params.campId),
-			campComments = await Comment.find({ campId: camp._id });
+		const camp         = await Camp.findById(req.params.campId),
+		      campComments = await Comment.find({ campId: camp._id });
 		if (!campComments.length || !camp) {
 			throw new Error();
 		}
@@ -64,8 +64,8 @@ router.put('/:commentId', middleware.isLoggedIn, middleware.hasCommentAuth, asyn
 router.delete('/:commentId', middleware.isLoggedIn, middleware.hasCommentAuth, async (req, res) => {
 	try {
 		await Comment.findByIdAndRemove(req.params.commentId);
-		const camp = await Camp.findById(req.params.campId),
-			campComments = await Comment.find({ campId: camp._id });
+		const camp         = await Camp.findById(req.params.campId),
+		      campComments = await Comment.find({ campId: camp._id });
 		if (!camp) {
 			throw new Error();
 		}
