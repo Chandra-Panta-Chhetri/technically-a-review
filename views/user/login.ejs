@@ -1,7 +1,13 @@
 <%- include("../partials/header") %>
 <div class="my-3">
 	<h1 class="text-center">Login</h1>
-	<div class="my-4">
+	<div class="text-center mt-3">
+		<h6>Sign in with other services</h6>
+		<a href="/auth/google" class="btn btn-danger mb-2"><i class="fab fa-google"></i></a>
+		<p><strong>Or</strong></p>
+	</div>
+	<div class="my-2">
+			<hr>
 			<form action="/login" method="POST" autocomplete="on">
 			<div class="form-group row justify-content-center">
 				<div class="col-12 col-md-6 col-lg-5">
@@ -21,7 +27,6 @@
 			</div>
 		</form>
 	</div>
-	<a href="/auth/google" class="btn btn-primary btn-block mb-2">Login with <i class="fab fa-google"></i></a>
 </div>
 <script src="/js/revealPassword.js"></script>
 <%- include("../partials/footer") %>

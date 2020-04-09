@@ -62,3 +62,7 @@ ul{
 .input-group-append > a:hover {
 	background: inherit;
 }
+
+hr{
+	width: 50%;
+}
