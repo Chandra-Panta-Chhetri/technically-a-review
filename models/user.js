@@ -11,7 +11,7 @@ const mongoose              = require('mongoose'),
 		type    : String,
 		required: true,
 		validate (value) {
-			if (!(value.toLowerCase().includes('cloudinary') || value.toLowerCase().includes('googleuser'))) {
+			if (!value.toLowerCase().includes('cloudinary')) {
 				throw new Error('Invalid avatar url');
 			}
 		}
