@@ -77,11 +77,13 @@ router.put(
 				});
 				req.body.user.avatarUrl = result.eager[0].secure_url;
 			}
-			user.email !== req.body.user.email ? (hasChangedEmail = true) : (hasChangedEmail = false);
-			await user.updateOne({ $set: req.body.user });
-			if (hasChangedEmail) {
-				req.flash('success', 'Profile successfully updated! Please sign in again for security reasons.');
-				return res.redirect(`/login`);
+			if(req.user.googleId === "-1"){
+				user.email !== req.body.user.email ? (hasChangedEmail = true) : (hasChangedEmail = false);
+				await user.updateOne({ $set: req.body.user });
+				if (hasChangedEmail) {
+					req.flash('success', 'Profile successfully updated! Please sign in again for security reasons.');
+					return res.redirect(`/login`);
+				}
 			}
 			req.flash('success', 'Profile successfully updated!');
 		} catch (e) {
