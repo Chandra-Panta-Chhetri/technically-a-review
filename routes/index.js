@@ -4,7 +4,8 @@ const express    = require('express'),
       User       = require('../models/user'),
       Async      = require('async'),
       nodemailer = require('nodemailer'),
-      middleware = require('../middleware/index')
+	  middleware = require('../middleware/index'),
+	  crypto     = require('crypto');
 	  
 router.get('/login', middleware.hasLoggedIn, (req, res) => res.render('user/login', { page: 'login' }));
 
@@ -40,7 +41,7 @@ router.post('/forgot', (req, res) => {
 			},
 			(token, done) => {
 				User.findOne({ email: req.body.email.toLowerCase() }, (err, user) => {
-					if (err || !user) {
+					if (err || !user || user.googleId !== "-1") {
 						req.flash(
 							'success',
 							`To reset your password, please follow the instructions sent to ${req.body.email.toLowerCase()}`
@@ -101,7 +102,7 @@ router.post('/reset/:token', (req, res) => {
 					{ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } },
 					(err, user) => {
 						if (!user || err) {
-							req.flash('error', 'Password Reset Token has expired or is invalid.');
+							req.flash('error', 'Password reset token has expired or is invalid.');
 							return res.redirect('/forgot');
 						}
 						if (req.body.password === req.body.confirm) {

@@ -20,7 +20,9 @@
 			<div class="d-flex flex-column align-items-center">
 				<div>
 					<a href="/users/<%= campCreator._id %>/edit" class="mt-2 btn btn-warning">Edit Profile</a>
-					<a href="/users/<%= campCreator._id %>/changePassword" class="mt-2 btn btn-primary">Change Password</a>
+					<% if(currentUser.googleId === "-1"){ %>
+						<a href="/users/<%= campCreator._id %>/changePassword" class="mt-2 btn btn-primary">Change Password</a>
+					<% }%>
 				</div>
 				<button class="btn btn-danger mt-2 mt-md-3" data-toggle="modal" data-target="#closeAccount">Close Account</button>
 			</div>

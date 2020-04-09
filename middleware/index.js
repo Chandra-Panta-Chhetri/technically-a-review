@@ -19,6 +19,14 @@ middleware.hasLoggedIn = (req, res, next) => {
 	res.redirect("/campgrounds");
 }
 
+middleware.hasGoogleAccount = (req, res, next) => {
+	if(req.user.googleId === "-1"){
+		return next();
+	}
+	req.flash("error", "You cannot change your password as you've signed in through Google");
+	res.redirect('/campgrounds');
+}
+
 middleware.hasCampAuth = async (req, res, next) => {
 	try {
 		const camp = await Camp.findById(req.params.campId);

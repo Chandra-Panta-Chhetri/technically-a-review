@@ -28,11 +28,9 @@
 							<a class="nav-link" href="/signup">Sign Up</a>
 						</li>
 					<% } else { %>
-						<li class="nav-item">
-							<a class="nav-link" href="#">Signed In as <%= currentUser.name %></a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="/users/<%= currentUser._id %>">View Profile</a>
+						<li class="nav-item d-flex justify-content-end align-items-center">
+							<img src="<%= currentUser.avatarUrl %>">
+							<a class="nav-link" href="/users/<%= currentUser._id %>"><%= currentUser.name %></a>
 						</li>
 						<li class="nav-item">
 							<a class="nav-link" href="/logout">Logout</a>

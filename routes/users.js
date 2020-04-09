@@ -108,11 +108,11 @@ router.delete('/:userId', middleware.isLoggedIn, middleware.hasProfileAuth, asyn
 	}
 });
 
-router.get('/:userId/changePassword', middleware.isLoggedIn, middleware.hasProfileAuth, (req, res) =>
+router.get('/:userId/changePassword', middleware.isLoggedIn, middleware.hasGoogleAccount, middleware.hasProfileAuth, (req, res) =>
 	res.render('user/changePassword', { userId: req.params.userId })
 );
 
-router.post('/:userId/changePassword', middleware.isLoggedIn, middleware.hasProfileAuth, async (req, res) => {
+router.post('/:userId/changePassword', middleware.isLoggedIn, middleware.hasGoogleAccount, middleware.hasProfileAuth, async (req, res) => {
 	try {
 		const user = await User.findById(req.params.userId);
 		if (req.body.newPass === req.body.confirmNewPass) {

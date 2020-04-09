@@ -3,7 +3,7 @@ const mongoose              = require('mongoose'),
       Comment               = require('./comment'),
       passportLocalMongoose = require('passport-local-mongoose'),
       userSchema            = new mongoose.Schema({
-    googleId : {type: String, default: "null"},
+    googleId : {type: String, default: "-1"},
     email    : { type: String, unique: true, required: true },
     password : String,
     name     : { type: String, required: true },
