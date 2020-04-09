@@ -73,7 +73,6 @@ router.delete('/:commentId', middleware.isLoggedIn, middleware.hasCommentAuth, a
 		await camp.save();
 		req.flash('success', 'Comment was successfully deleted!');
 	} catch (e) {
-		console.log(e);
 		req.flash('error', 'Cannot delete comment. Please try again later.');
 	}
 	return res.redirect(`/campgrounds/${req.params.campId}`);

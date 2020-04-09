@@ -4,13 +4,13 @@ const express    = require('express'),
       User       = require('../models/user'),
       Async      = require('async'),
       nodemailer = require('nodemailer'),
-      middleware = require('../middleware/index'),
-      helper     = require('./helpers/index');
-
-router.get('/login', (req, res) => res.render('user/login', { page: 'login' }));
+      middleware = require('../middleware/index')
+	  
+router.get('/login', middleware.hasLoggedIn, (req, res) => res.render('user/login', { page: 'login' }));
 
 router.post(
 	'/login',
+	middleware.hasLoggedIn,
 	middleware.lowercaseEmail,
 	passport.authenticate('local', { failureRedirect: '/login', failureFlash: 'Incorrect email or password.' }),
 	(req, res) => {
@@ -19,12 +19,12 @@ router.post(
 	}
 );
 
-router.get('/signup', (req, res) => res.render('user/signup', { page: 'signup' }));
+router.get('/signup', middleware.hasLoggedIn, (req, res) => res.render('user/signup', { page: 'signup' }));
 
-router.get('/logout', (req, res) => {
-	req.logout();
-	req.flash('success', 'Successfully logged out!');
-	return res.redirect('/campgrounds');
+router.get('/logout', middleware.isLoggedIn, (req, res) => {
+		req.logout();
+		req.flash('success', 'Successfully logged out!');
+		res.redirect('/campgrounds');
 });
 
 router.get('/forgot', (req, res) => res.render('user/forgot'));
@@ -82,13 +82,6 @@ router.post('/forgot', (req, res) => {
 		(err) => res.redirect('/forgot')
 	);
 });
-
-function generateResetToken (cb) {
-	crypto.randomBytes(20, (err, buf) => {
-		var token = buf.toString('hex');
-		cb(err, token);
-	});
-}
 
 router.get('/reset/:token', async (req, res) => {
 	try {
@@ -151,6 +144,12 @@ router.post('/reset/:token', (req, res) => {
 		],
 		(err) => res.redirect('/campgrounds')
 	);
+});
+
+router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/auth/google/redirect', passport.authenticate('google', {failureRedirect: '/login', failureMessage: 'Login unsuccessful, please try again'}), (req, res) => {
+	req.flash('success', `Welcome to YelpCamp ${req.user.name}!`);
+	res.redirect("/campgrounds");
 });
 
 module.exports = router;

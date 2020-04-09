@@ -11,6 +11,14 @@ middleware.isLoggedIn = (req, res, next) => {
 	res.redirect('/login');
 };
 
+middleware.hasLoggedIn = (req, res, next) => {
+	if(!req.isAuthenticated()){
+		return next();
+	}
+	req.flash("error", "Please logout before you do that.");
+	res.redirect("/campgrounds");
+}
+
 middleware.hasCampAuth = async (req, res, next) => {
 	try {
 		const camp = await Camp.findById(req.params.campId);

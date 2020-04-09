@@ -9,6 +9,7 @@ const express    = require('express'),
 
 router.post(
 	'/',
+	middleware.hasLoggedIn,
 	upload.single('avatar'),
 	async (req, res) => {
 		try {

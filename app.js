@@ -3,13 +3,15 @@ const express          = require('express'),
       app              = express(),
       bodyParser       = require('body-parser'),
       mongoose         = require('mongoose'),
+      passportSetup    = require('./routes/utils/passportGoogleConfig'),
       indexRoutes      = require('./routes/index'),
       commentRoutes    = require('./routes/comments'),
       campgroundRoutes = require('./routes/campgrounds'),
       userRoutes       = require('./routes/users'),
       methodOverride   = require('method-override'),
       flash            = require('connect-flash'),
-      passport         = require('./routes/utils/passportLocalConfig');
+      cookieSession    = require('cookie-session'),
+      passport         = require('passport');
 
 mongoose.connect(process.env.DBURL, {
 	useNewUrlParser   : true,
@@ -23,7 +25,12 @@ app.use(express.static(`${__dirname}/public`));
 app.use(flash());
 app.set('view engine', 'ejs');
 
-app.use(require('express-session')({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false }));
+// app.use(require('express-session')({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false }));
+app.use(cookieSession({
+    maxAge: 24 * 60 * 60 * 1000,
+    keys: [process.env.SESSION_SECRET]
+}));
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(methodOverride('_method'));
