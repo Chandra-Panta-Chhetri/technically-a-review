@@ -1,7 +1,7 @@
 const middleware = {},
-      Camp       = require('../models/camp'),
-      Comment    = require('../models/comment'),
-      User       = require('../models/user');
+	Camp = require('../models/camp'),
+	Comment = require('../models/comment'),
+	User = require('../models/user');
 
 middleware.isLoggedIn = (req, res, next) => {
 	if (req.isAuthenticated()) {
@@ -12,20 +12,20 @@ middleware.isLoggedIn = (req, res, next) => {
 };
 
 middleware.hasLoggedIn = (req, res, next) => {
-	if(!req.isAuthenticated()){
+	if (!req.isAuthenticated()) {
 		return next();
 	}
-	req.flash("error", "Please logout before you do that.");
-	res.redirect("/campgrounds");
-}
+	req.flash('error', 'Please logout before you do that.');
+	res.redirect('/campgrounds/page/1');
+};
 
 middleware.hasGoogleAccount = (req, res, next) => {
-	if(req.user.googleId === "-1"){
+	if (req.user.googleId === '-1') {
 		return next();
 	}
-	req.flash("error", "You cannot change your password as you've signed in through Google");
+	req.flash('error', "You cannot change your password as you've signed in through Google");
 	res.redirect('/campgrounds');
-}
+};
 
 middleware.hasCampAuth = async (req, res, next) => {
 	try {
@@ -61,7 +61,7 @@ middleware.hasCommentAuth = async (req, res, next) => {
 
 middleware.commentStatus = async (userId, campId) => await Comment.findOne({ campId, 'author.id': userId });
 
-middleware.hasCommented = async function (req, res, next) {
+middleware.hasCommented = async function(req, res, next) {
 	const comment = await middleware.commentStatus(req.user._id, req.params.campId);
 	if (!comment) {
 		return next();

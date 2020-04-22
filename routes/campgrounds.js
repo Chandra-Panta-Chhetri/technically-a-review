@@ -1,26 +1,51 @@
-const express    = require('express'),
-      router     = express.Router(),
-      Camp       = require('../models/camp'),
-      Comment    = require('../models/comment'),
-      middleware = require('../middleware/index'),
-      cloudinary = require('./utils/cloudinaryConfig'),
-      upload     = require('./utils/multerConfig'),
-      mongoose   = require('mongoose'),
-      helper     = require('./helpers/index');
+const express = require('express'),
+	router = express.Router(),
+	Camp = require('../models/camp'),
+	Comment = require('../models/comment'),
+	middleware = require('../middleware/index'),
+	cloudinary = require('./utils/cloudinaryConfig'),
+	upload = require('./utils/multerConfig'),
+	mongoose = require('mongoose'),
+	helper = require('./helpers/index');
 
-router.get('/', async (req, res) => {
+router.get('/', (req, res) => res.redirect('/campgrounds/page/1'));
+
+router.get('/page/:currentPageNum', async (req, res) => {
 	var camps;
+	const perPage = 1,
+		page = req.params.currentPageNum || 1,
+		skipNum = perPage * page - perPage,
+		numCamps = await Camp.countDocuments();
 	try {
 		if (req.query.search) {
 			const regex = new RegExp(helper.escapeRegex(req.query.search), 'gi');
-			      camps = await Camp.find({ $or: [ { name: regex }, { 'author.name': regex } ] });
-			return res.render('campground/index', { camps, page: 'campgrounds', searched: true });
+			const numCampsFiltered = await Camp.find({
+				$or: [ { name: regex } ]
+			}).countDocuments();
+			camps = await Camp.find({ $or: [ { name: regex }, { 'author.name': regex } ] })
+				.sort({ updatedAt: 'desc' })
+				.skip(skipNum)
+				.limit(perPage)
+				.exec();
+			await helper.populateCamps(camps);
+			return res.render('campground/index', {
+				camps,
+				pageName: 'campgrounds',
+				searched: true,
+				currentPageNum: page,
+				numPages: Math.ceil(numCampsFiltered / perPage),
+				query: req.query.search
+			});
 		}
-		camps = await Camp.find({});
-		for (let camp of camps) {
-			await camp.populate('comments').execPopulate();
-		}
-		return res.render('campground/index', { camps, page: 'campgrounds', searched: false });
+		camps = await Camp.find({}).sort({ updatedAt: 'desc' }).skip(skipNum).limit(perPage).exec();
+		await helper.populateCamps(camps);
+		return res.render('campground/index', {
+			camps,
+			pageName: 'campgrounds',
+			searched: false,
+			currentPageNum: page,
+			numPages: Math.ceil(numCamps / perPage)
+		});
 	} catch (e) {
 		res.redirect('/');
 	}
@@ -37,11 +62,11 @@ router.post(
 			const campId = new mongoose.Types.ObjectId();
 			const result = await cloudinary.uploader.upload(req.file.path, {
 				public_id: campId,
-				eager    : [ { width: 350, height: 250, crop: 'scale', quality: '100' } ]
+				eager: [ { width: 350, height: 250, crop: 'scale', quality: '100' } ]
 			});
-			req.body.camp.author   = { id: req.user._id, name: req.user.name };
+			req.body.camp.author = { id: req.user._id, name: req.user.name };
 			req.body.camp.imageUrl = result.eager[0].secure_url;
-			req.body.camp._id      = campId;
+			req.body.camp._id = campId;
 			await Camp.create(req.body.camp);
 			req.flash('success', 'Campground successfully created!');
 		} catch (e) {
@@ -58,7 +83,7 @@ router.post(
 router.get('/:campId', async (req, res) => {
 	try {
 		const comments = await Comment.find({ campId: req.params.campId });
-		const camp     = await Camp.findById(req.params.campId);
+		const camp = await Camp.findById(req.params.campId);
 		if (!camp) {
 			throw new Error();
 		}
@@ -69,7 +94,7 @@ router.get('/:campId', async (req, res) => {
 		return res.render('campground/show', { camp, comments, commentId: -1 });
 	} catch (e) {
 		req.flash('error', 'Sorry, no campground found.');
-		return res.redirect('/campgrounds');
+		return res.redirect('/campgrounds/page/1');
 	}
 });
 
@@ -90,7 +115,7 @@ router.put(
 				cloudinary.uploader.destroy(camp._id);
 				const result = await cloudinary.uploader.upload(req.file.path, {
 					public_id: camp._id,
-					eager    : [ { width: 350, height: 250, crop: 'scale', quality: '100' } ]
+					eager: [ { width: 350, height: 250, crop: 'scale', quality: '100' } ]
 				});
 				req.body.camp.imageUrl = result.eager[0].secure_url;
 			}

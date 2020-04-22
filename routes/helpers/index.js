@@ -13,4 +13,10 @@ helper.calculateAvgRating = (comments) => {
 
 helper.escapeRegex = (text) => text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 
+helper.populateCamps = async (camps) => {
+	for (let camp of camps) {
+		await camp.populate('comments').execPopulate();
+	}
+};
+
 module.exports = helper;
