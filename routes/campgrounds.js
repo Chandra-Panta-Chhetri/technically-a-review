@@ -11,23 +11,26 @@ const express = require('express'),
 router.get('/', (req, res) => res.redirect('/campgrounds/page/1'));
 
 router.get('/page/:currentPageNum', async (req, res) => {
-	var camps;
-	const perPage = 1,
+	var camps,
 		page = req.params.currentPageNum || 1,
-		skipNum = perPage * page - perPage,
-		numCamps = await Camp.countDocuments();
+		skipNum;
+	const perPage = 1;
 	try {
 		if (req.query.search) {
 			const regex = new RegExp(helper.escapeRegex(req.query.search), 'gi');
 			const numCampsFiltered = await Camp.find({
 				$or: [ { name: regex } ]
 			}).countDocuments();
+			if (Number(page) <= 0 || Number(page) > numCampsFiltered) {
+				return res.redirect('/campgrounds/page/1');
+			}
+			skipNum = perPage * page - perPage;
 			camps = await Camp.find({ $or: [ { name: regex }, { 'author.name': regex } ] })
 				.sort({ updatedAt: 'desc' })
 				.skip(skipNum)
 				.limit(perPage)
 				.exec();
-			await helper.populateCamps(camps);
+			await helper.populateComments(camps);
 			return res.render('campground/index', {
 				camps,
 				pageName: 'campgrounds',
@@ -37,8 +40,13 @@ router.get('/page/:currentPageNum', async (req, res) => {
 				query: req.query.search
 			});
 		}
+		const numCamps = await Camp.countDocuments();
+		if (Number(page) <= 0 || Number(page) > numCamps) {
+			return res.redirect('/campgrounds/page/1');
+		}
+		skipNum = perPage * page - perPage;
 		camps = await Camp.find({}).sort({ updatedAt: 'desc' }).skip(skipNum).limit(perPage).exec();
-		await helper.populateCamps(camps);
+		await helper.populateComments(camps);
 		return res.render('campground/index', {
 			camps,
 			pageName: 'campgrounds',
