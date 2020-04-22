@@ -36,7 +36,7 @@ router.get('/page/:currentPageNum', async (req, res) => {
 				pageName: 'campgrounds',
 				searched: true,
 				currentPageNum: page,
-				numPages: Math.ceil(numCampsFiltered / perPage),
+				numCamps: numCampsFiltered,
 				query: req.query.search
 			});
 		}
@@ -52,7 +52,7 @@ router.get('/page/:currentPageNum', async (req, res) => {
 			pageName: 'campgrounds',
 			searched: false,
 			currentPageNum: page,
-			numPages: Math.ceil(numCamps / perPage)
+			numCamps
 		});
 	} catch (e) {
 		res.redirect('/');

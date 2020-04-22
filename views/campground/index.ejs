@@ -14,13 +14,16 @@
 			</form>
 		</div>
 	<% } else{ %>
-		<% if (typeof query !== 'undefined' && query.length > 0) { %>
-			<div>
-				<i class="fas fa-filter mr-2 mb-4"></i>
+		<div class="mb-3">
+			<% if (typeof query !== 'undefined' && query.length > 0) { %>
+				<i class="fas fa-filter mr-2"></i>
 				keyword: <%= query %>
 				<a href="/campgrounds/page/1" class="btn btn-danger btn-sm ml-2">Clear Filter</a>
-			</div>
-		<% } %>
+				<span class="float-right"><%= numCamps %> <%= numCamps > 1 ? 'results' : 'result' %></span>
+			<% } else { %>
+				<span><%= numCamps %> camps in total</span>
+			<% }%>
+		</div>
 	   <div class="row justify-content-between text-center align-items-center">	 
 	<% } %>
 	<% camps.forEach(function(camp){ %>
@@ -46,6 +49,7 @@
 		</div>
 	<% }); %>
 	</div>
+	<% var numPages = Math.ceil(numCamps / 1) %>
 	<% if (numPages > 0) { %>
 		<div class="row justify-content-center mt-3">
 			<ul class="pagination">
