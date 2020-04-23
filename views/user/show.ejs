@@ -3,13 +3,14 @@
 	<div class="col-12 col-lg-5 order-2 order-lg-1 mt-3 mt-lg-0">
 		<h3>Created Campgrounds:</h3>
 		<% if(usersCamps.length == 0) { %>
-			<p>No camps created yet.</p>
+		<p>No camps created yet.</p>
 		<% } %>
 		<ul class="pl-0">
 			<% usersCamps.forEach(function(camp){ %>
-				<li>
-					<a href="/campgrounds/<%= camp._id %>"><%= camp.name %></a> - Created <%= moment(camp.createdAt).fromNow() %>
-				</li>
+			<li>
+				<a href="/campgrounds/<%= camp._id %>"><%= camp.name %></a> - Created
+				<%= moment(camp.createdAt).fromNow() %>
+			</li>
 			<% });%>
 		</ul>
 	</div>
@@ -17,34 +18,35 @@
 		<h1><%= campCreator.fullName %></h1>
 		<img src="<%= campCreator.avatarUrl %>">
 		<% if(currentUser && currentUser._id.equals(campCreator._id)) { %>
-			<div class="d-flex flex-column align-items-center">
-				<div>
-					<a href="/users/<%= campCreator._id %>/edit" class="mt-2 btn btn-warning">Edit Profile</a>
-					<% if(currentUser.googleId === "-1"){ %>
-						<a href="/users/<%= campCreator._id %>/changePassword" class="mt-2 btn btn-primary">Change Password</a>
-					<% }%>
-				</div>
-				<button class="btn btn-danger mt-2 mt-md-3" data-toggle="modal" data-target="#closeAccount">Close Account</button>
+		<div class="d-flex flex-column align-items-center">
+			<div>
+				<a href="/users/<%= campCreator._id %>/edit" class="mt-2 btn btn-warning">Edit Profile</a>
+				<% if(currentUser.googleId === "-1"){ %>
+				<a href="/users/<%= campCreator._id %>/changePassword" class="mt-2 btn btn-primary">Change Password</a>
+				<% }%>
 			</div>
-			<div class="modal fade" id="closeAccount" tabindex="-1" role="dialog">
-				<div class="modal-dialog modal-dialog-centered" role="document">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h5 class="modal-title">Account Deletion Confirmation</h5>
-							<button class="close" data-dismiss="modal"></button>
-						</div>
-						<div class="modal-body">
-							Are you sure you want to close your account?
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
-							<form action="/users/<%= campCreator._id %>?_method=DELETE" method="POST">
-								<button type="submit" class="btn btn-danger">Yes, I'm sure</button>
-							</form>
-						</div>
+			<button class="btn btn-danger mt-2 mt-md-3" data-toggle="modal" data-target="#closeAccount">Close
+				Account</button>
+		</div>
+		<div class="modal fade" id="closeAccount" tabindex="-1" role="dialog">
+			<div class="modal-dialog modal-dialog-centered" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Account Deletion Confirmation</h5>
+						<button class="close" data-dismiss="modal"></button>
+					</div>
+					<div class="modal-body">
+						Are you sure you want to close your account?
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+						<form action="/users/<%= campCreator._id %>?_method=DELETE" method="POST">
+							<button type="submit" class="btn btn-danger">Yes, I'm sure</button>
+						</form>
 					</div>
 				</div>
 			</div>
+		</div>
 		<% } %>
 	</div>
 </div>

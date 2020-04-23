@@ -1,48 +1,54 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Yelp Camp</title>
-		<link rel="icon" href="https://previews.123rf.com/images/tmricons/tmricons1510/tmricons151000590/45815253-camp-icon.jpg">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css">
-		<link rel="stylesheet" href="/css/camp.css">
-	</head>
-	<body>
+
+<head>
+	<title>Yelp Camp</title>
+	<link rel="icon"
+		href="https://previews.123rf.com/images/tmricons/tmricons1510/tmricons151000590/45815253-camp-icon.jpg">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css">
+	<link rel="stylesheet" href="/css/camp.css">
+</head>
+
+<body>
 	<nav class="navbar navbar-expand-lg navbar-light bg-light">
 		<div class="container text-center">
 			<a class="navbar-brand" href="/">YelpCamp</a>
-			<a class="nav-link d-none d-lg-block text-secondary <%= typeof pageName !== 'undefined' && pageName === 'campgrounds' ? 'active-page' : '' %>" href="/campgrounds/page/1">
+			<a class="nav-link d-none d-lg-block text-secondary <%= typeof pageName !== 'undefined' && pageName === 'campgrounds' ? 'active-page' : '' %>"
+				href="/campgrounds/page/1">
 				Home
 			</a>
 			<button class="navbar-toggler" data-toggle="collapse" data-target="#navbarMenu">
 				<span class="navbar-toggler-icon"></span>
-			  </button>
-			  <div class="collapse navbar-collapse" id="navbarMenu">
+			</button>
+			<div class="collapse navbar-collapse" id="navbarMenu">
 				<ul class="navbar-nav ml-auto">
 					<% if(!currentUser){ %>
-						<li class="nav-item <%= typeof pageName !== 'undefined' && pageName === 'login' ? 'active-page' : '' %>">
-							<a class="nav-link" href="/login">Login</a>
-						</li>
-						<li class="nav-item <%= typeof pageName !== 'undefined' && pageName === 'signup' ? 'active-page' : '' %>">
-							<a class="nav-link" href="/signup">Sign Up</a>
-						</li>
+					<li
+						class="nav-item <%= typeof pageName !== 'undefined' && pageName === 'login' ? 'active-page' : '' %>">
+						<a class="nav-link" href="/login">Login</a>
+					</li>
+					<li
+						class="nav-item <%= typeof pageName !== 'undefined' && pageName === 'signup' ? 'active-page' : '' %>">
+						<a class="nav-link" href="/signup">Sign Up</a>
+					</li>
 					<% } else { %>
-						<li class="nav-item d-flex justify-content-center justify-content-lg-end align-items-center">
-							<img class="mr-1 mr-lg-0" src="<%= currentUser.avatarUrl %>">
-							<a class="nav-link" href="/users/<%= currentUser._id %>"><%= currentUser.name %></a>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="/logout">Logout</a>
-						</li>
+					<li class="nav-item d-flex justify-content-center justify-content-lg-end align-items-center">
+						<img class="mr-1 mr-lg-0" src="<%= currentUser.avatarUrl %>">
+						<a class="nav-link" href="/users/<%= currentUser._id %>"><%= currentUser.name %></a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link" href="/logout">Logout</a>
+					</li>
 					<% }%>
 				</ul>
-			  </div>
+			</div>
 		</div>
-	</nav>		
+	</nav>
 	<div class="container mb-5">
 		<% if(error && error.length > 0){ %>
-			<div class="alert alert-danger mt-2" role="alert"><%= error %></div>
+		<div class="alert alert-danger mt-2" role="alert"><%= error %></div>
 		<% }else if(success && success.length > 0){ %>
-			<div class="alert alert-success mt-2" role="alert"><%= success %></div>
+		<div class="alert alert-success mt-2" role="alert"><%= success %></div>
 		<% } %>

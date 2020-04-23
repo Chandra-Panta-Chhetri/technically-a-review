@@ -1,106 +1,112 @@
 <%- include("../partials/header") %>
-	<div class="row mt-3">
-		<div class="col-md-3 mb-3 mb-md-0">
-			<h4>YelpCamp</h4>
-			<div class="card">
-				<ul class="list-group list-group-flush">
-					<li class="list-group-item active">Info 1</li>
-					<li class="list-group-item">Info 2</li>
-					<li class="list-group-item">Info 3</li>
-				</ul>
-			</div>
-		</div>
-		<div class="col-md-9">
-			<div class="border rounded p-0">
-				<img src="<%= camp.imageUrl %>">
-				<div class="mt-2 p-2">
-					<h5 class="text-primary"><%= camp.name %>
-						<strong>
-							<span class="float-right text-dark mt-4 mt-sm-0">$<%= camp.price %>/night</span>
-						</strong>
-					</h5>
-					<p class="mt-4 mt-sm-3"><%= camp.description %></p>
-					<p>Created by: <a href="/users/<%= camp.author.id %>"><%= camp.author.name %></a></p>
-					<p>Updated: <%= moment(camp.updatedAt).fromNow() %></p>
-					<% if(currentUser && (camp.author.id.equals(currentUser._id) || currentUser.isAdmin)){ %>
-						<a class="btn btn-xs btn-warning" href="/campgrounds/<%= camp._id %>/edit">Edit</a>
-						<form action="/campgrounds/<%= camp._id %>/?_method=DELETE" method="POST">
-							<button class="btn btn-xs btn-danger">Delete</button>
-						</form>
-					<% } %>
-				</div>
-			</div>
-			<div class="my-3 p-3 rounded border bg-light">
-				<% for(var i = 1; i <= 5; i++){ %>
-					<% if(i <= camp.avgRating){ %>
-						<i class="fas fa-star text-warning"></i>
-					<% }else{ %>
-						<i class="far fa-star"></i>
-					<% } %>
-				<% } %>
-				<span>(Total Reviews: <%= numOfComments %>)</span>
-				<div class="float-right mb-2 mt-2 mt-0-md">
-					<% if(commentId !== -1){ %>
-						<a class="btn btn-xs btn-warning" href="/campgrounds/<%= camp._id %>/comments/<%= commentId %>/edit">Edit</a>
-						<form action="/campgrounds/<%= camp._id %>/comments/<%= commentId %>/?_method=DELETE" method="POST">
-							<button class="btn btn-xs btn-danger">Delete</button>
-						</form>
-					<% } else{ %>
-						<a class="btn btn-md btn-success float-right mb-2" href="/campgrounds/<%= camp._id %>/comments/new">Add Comment</a>
-					<% }%>
-				</div>
-				<hr>
-				<% camp.comments.forEach(function(comment){ %>
-					<p>
-						<% for(var i = 1; i <= 5; i++){ %>
-							<% if(i <= comment.rating){ %>
-								<i class="fas fa-star text-warning"></i>
-							<% }else{ %>
-								<i class="far fa-star"></i>
-							<% } %>
-						<% } %>
-						<span class="float-right ml-2 ml-sm-0">Posted: <%= moment(comment.createdAt).fromNow() %></span>
-						<br>
-						<strong><a href="/users/<%= camp.author.id %>"><%= comment.author.name %></a></strong>
-					</p>
-					<p><%= comment.content %></p>
-					<% if(currentUser && currentUser.isAdmin) { %>
-						<div class="mb-2">
-							<a class="btn btn-xs btn-warning" href="/campgrounds/<%= camp._id %>/comments/<%= comment._id %>/edit">Edit</a>
-							<form action="/campgrounds/<%= camp._id %>/comments/<%= comment._id %>/?_method=DELETE" method="POST">
-								<button class="btn btn-xs btn-danger">Delete</button>
-							</form>
-						</div>
-					<% } %>
-				<% }); %>
-				<% var numPages = Math.ceil(numOfComments / 4) %>
-				<% if (numPages > 0) { %>
-					<section class="row justify-content-center mt-3">
-						<ul class="pagination">
-							<% if (Number(currentPageNum) - 1 > 0) { %>
-								<li class="page-item"><a class="page-link" href="/campgrounds/<%= camp._id %>/page/<%= Number(currentPageNum) - 1 %>">Prev</a></li>
-							<% } %>
-							<% var i = (Number(currentPageNum) > 5 ? Number(currentPageNum) - 4 : 1) %>
-							<% if (i !== 1) { %>
-								<li class="page-item"><a class="page-link">...</a></li>
-							<% } %>
-							<% for (; i <= (Number(currentPageNum) + 4) && i <= numPages; i++) { %>
-								<% if (i == currentPageNum) { %>
-									<li class="page-item active"><a class="page-link"><%= i %></a></li>
-								<% } else { %>
-									<li class="page-item"><a class="page-link" href="/campgrounds/<%= camp._id %>/page/<%= i %>"><%= i %></a></li>
-								<% } %>
-								<% if (i == Number(currentPageNum) + 4 && i < numPages) { %>
-									<li class="page-item"><a class="page-link">...</a></li>
-								<% } %>
-							<% } %>
-							<% if (Number(currentPageNum) + 1 <= numPages) { %>
-								<li class="page-item"><a class="page-link" href="/campgrounds/<%= camp._id %>/page/<%= Number(currentPageNum) + 1 %>">Next</a></li>
-							<% } %>
-						</ul>
-					</section>
-				<% } %>
-			</div>
+<div class="row mt-3">
+	<div class="col-md-3 mb-3 mb-md-0">
+		<h4>YelpCamp</h4>
+		<div class="card">
+			<ul class="list-group list-group-flush">
+				<li class="list-group-item active">Info 1</li>
+				<li class="list-group-item">Info 2</li>
+				<li class="list-group-item">Info 3</li>
+			</ul>
 		</div>
 	</div>
+	<div class="col-md-9">
+		<div class="border rounded p-0">
+			<img src="<%= camp.imageUrl %>">
+			<div class="mt-2 p-2">
+				<h5 class="text-primary"><%= camp.name %>
+					<strong>
+						<span class="float-right text-dark mt-4 mt-sm-0">$<%= camp.price %>/night</span>
+					</strong>
+				</h5>
+				<p class="mt-4 mt-sm-3"><%= camp.description %></p>
+				<p>Created by: <a href="/users/<%= camp.author.id %>"><%= camp.author.name %></a></p>
+				<p>Updated: <%= moment(camp.updatedAt).fromNow() %></p>
+				<% if(currentUser && (camp.author.id.equals(currentUser._id) || currentUser.isAdmin)){ %>
+				<a class="btn btn-xs btn-warning" href="/campgrounds/<%= camp._id %>/edit">Edit</a>
+				<form action="/campgrounds/<%= camp._id %>/?_method=DELETE" method="POST">
+					<button class="btn btn-xs btn-danger">Delete</button>
+				</form>
+				<% } %>
+			</div>
+		</div>
+		<div class="my-3 p-3 rounded border bg-light">
+			<% for(var i = 1; i <= 5; i++){ %>
+			<% if(i <= camp.avgRating){ %>
+			<i class="fas fa-star text-warning"></i>
+			<% }else{ %>
+			<i class="far fa-star"></i>
+			<% } %>
+			<% } %>
+			<span>(Total Reviews: <%= numOfComments %>)</span>
+			<div class="float-right mb-2 mt-2 mt-0-md">
+				<% if(commentId !== -1){ %>
+				<a class="btn btn-xs btn-warning"
+					href="/campgrounds/<%= camp._id %>/comments/<%= commentId %>/edit">Edit</a>
+				<form action="/campgrounds/<%= camp._id %>/comments/<%= commentId %>/?_method=DELETE" method="POST">
+					<button class="btn btn-xs btn-danger">Delete</button>
+				</form>
+				<% } else{ %>
+				<a class="btn btn-md btn-success float-right mb-2" href="/campgrounds/<%= camp._id %>/comments/new">Add
+					Comment</a>
+				<% }%>
+			</div>
+			<hr>
+			<% camp.comments.forEach(function(comment){ %>
+			<p>
+				<% for(var i = 1; i <= 5; i++){ %>
+				<% if(i <= comment.rating){ %>
+				<i class="fas fa-star text-warning"></i>
+				<% }else{ %>
+				<i class="far fa-star"></i>
+				<% } %>
+				<% } %>
+				<span class="float-right ml-2 ml-sm-0">Posted: <%= moment(comment.createdAt).fromNow() %></span>
+				<br>
+				<strong><a href="/users/<%= camp.author.id %>"><%= comment.author.name %></a></strong>
+			</p>
+			<p><%= comment.content %></p>
+			<% if(currentUser && currentUser.isAdmin) { %>
+			<div class="mb-2">
+				<a class="btn btn-xs btn-warning"
+					href="/campgrounds/<%= camp._id %>/comments/<%= comment._id %>/edit">Edit</a>
+				<form action="/campgrounds/<%= camp._id %>/comments/<%= comment._id %>/?_method=DELETE" method="POST">
+					<button class="btn btn-xs btn-danger">Delete</button>
+				</form>
+			</div>
+			<% } %>
+			<% }); %>
+			<% var numPages = Math.ceil(numOfComments / 4) %>
+			<% if (numPages > 0) { %>
+			<section class="row justify-content-center mt-3">
+				<ul class="pagination">
+					<% if (Number(currentPageNum) - 1 > 0) { %>
+					<li class="page-item"><a class="page-link"
+							href="/campgrounds/<%= camp._id %>/page/<%= Number(currentPageNum) - 1 %>">Prev</a></li>
+					<% } %>
+					<% var i = (Number(currentPageNum) > 5 ? Number(currentPageNum) - 4 : 1) %>
+					<% if (i !== 1) { %>
+					<li class="page-item"><a class="page-link">...</a></li>
+					<% } %>
+					<% for (; i <= (Number(currentPageNum) + 4) && i <= numPages; i++) { %>
+					<% if (i == currentPageNum) { %>
+					<li class="page-item active"><a class="page-link"><%= i %></a></li>
+					<% } else { %>
+					<li class="page-item"><a class="page-link"
+							href="/campgrounds/<%= camp._id %>/page/<%= i %>"><%= i %></a></li>
+					<% } %>
+					<% if (i == Number(currentPageNum) + 4 && i < numPages) { %>
+					<li class="page-item"><a class="page-link">...</a></li>
+					<% } %>
+					<% } %>
+					<% if (Number(currentPageNum) + 1 <= numPages) { %>
+					<li class="page-item"><a class="page-link"
+							href="/campgrounds/<%= camp._id %>/page/<%= Number(currentPageNum) + 1 %>">Next</a></li>
+					<% } %>
+				</ul>
+			</section>
+			<% } %>
+		</div>
+	</div>
+</div>
 <%- include("../partials/footer") %>

@@ -21,7 +21,7 @@ router.get('/page/:currentPageNum', async (req, res) => {
 			const numCampsFiltered = await Camp.find({
 				$or: [ { name: regex } ]
 			}).countDocuments();
-			if (Number(page) <= 0 || Number(page) > Math.ceil(numCampsFiltered / perPage)) {
+			if (numCampsFiltered && (Number(page) <= 0 || Number(page) > Math.ceil(numCampsFiltered / perPage))) {
 				return res.redirect('/campgrounds/page/1');
 			}
 			skipNum = perPage * page - perPage;

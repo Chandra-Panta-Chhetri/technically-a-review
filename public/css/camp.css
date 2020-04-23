@@ -67,3 +67,7 @@ li.nav-item > img {
 	width: 10%;
 	height: 80%;
 }
+
+.clear-search {
+	white-space: nowrap;
+}
