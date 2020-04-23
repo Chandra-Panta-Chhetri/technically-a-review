@@ -16,7 +16,7 @@ router.post(
 	passport.authenticate('local', { failureRedirect: '/login', failureFlash: 'Incorrect email or password.' }),
 	(req, res) => {
 		req.flash('success', `Welcome back ${req.user.name}!`);
-		return res.redirect('/campgrounds');
+		return res.redirect('/campgrounds/page/1');
 	}
 );
 
@@ -25,7 +25,7 @@ router.get('/signup', middleware.hasLoggedIn, (req, res) => res.render('user/sig
 router.get('/logout', middleware.isLoggedIn, (req, res) => {
 	req.logout();
 	req.flash('success', 'Successfully logged out!');
-	res.redirect('/campgrounds');
+	res.redirect('/campgrounds/page/1');
 });
 
 router.get('/forgot', (req, res) => res.render('user/forgot'));
@@ -142,7 +142,7 @@ router.post('/reset/:token', (req, res) => {
 				});
 			}
 		],
-		(err) => res.redirect('/campgrounds')
+		(err) => res.redirect('/campgrounds/page/1')
 	);
 });
 
@@ -155,7 +155,7 @@ router.get(
 	}),
 	(req, res) => {
 		req.flash('success', `Welcome to YelpCamp ${req.user.name}!`);
-		res.redirect('/campgrounds');
+		res.redirect('/campgrounds/page/1');
 	}
 );
 

@@ -30,7 +30,6 @@
 					<% } %>
 				</div>
 			</div>
-			
 			<div class="my-3 p-3 rounded border bg-light">
 				<% for(var i = 1; i <= 5; i++){ %>
 					<% if(i <= camp.avgRating){ %>
@@ -39,7 +38,7 @@
 						<i class="far fa-star"></i>
 					<% } %>
 				<% } %>
-				<span>(Total Reviews: <%= comments.length %>)</span>
+				<span>(Total Reviews: <%= numOfComments %>)</span>
 				<div class="float-right mb-2 mt-2 mt-0-md">
 					<% if(commentId !== -1){ %>
 						<a class="btn btn-xs btn-warning" href="/campgrounds/<%= camp._id %>/comments/<%= commentId %>/edit">Edit</a>
@@ -51,7 +50,7 @@
 					<% }%>
 				</div>
 				<hr>
-				<% comments.forEach(function(comment){ %>
+				<% camp.comments.forEach(function(comment){ %>
 					<p>
 						<% for(var i = 1; i <= 5; i++){ %>
 							<% if(i <= comment.rating){ %>
@@ -74,6 +73,33 @@
 						</div>
 					<% } %>
 				<% }); %>
+				<% var numPages = Math.ceil(numOfComments / 4) %>
+				<% if (numPages > 0) { %>
+					<section class="row justify-content-center mt-3">
+						<ul class="pagination">
+							<% if (Number(currentPageNum) - 1 > 0) { %>
+								<li class="page-item"><a class="page-link" href="/campgrounds/<%= camp._id %>/page/<%= Number(currentPageNum) - 1 %>">Prev</a></li>
+							<% } %>
+							<% var i = (Number(currentPageNum) > 5 ? Number(currentPageNum) - 4 : 1) %>
+							<% if (i !== 1) { %>
+								<li class="page-item"><a class="page-link">...</a></li>
+							<% } %>
+							<% for (; i <= (Number(currentPageNum) + 4) && i <= numPages; i++) { %>
+								<% if (i == currentPageNum) { %>
+									<li class="page-item active"><a class="page-link"><%= i %></a></li>
+								<% } else { %>
+									<li class="page-item"><a class="page-link" href="/campgrounds/<%= camp._id %>/page/<%= i %>"><%= i %></a></li>
+								<% } %>
+								<% if (i == Number(currentPageNum) + 4 && i < numPages) { %>
+									<li class="page-item"><a class="page-link">...</a></li>
+								<% } %>
+							<% } %>
+							<% if (Number(currentPageNum) + 1 <= numPages) { %>
+								<li class="page-item"><a class="page-link" href="/campgrounds/<%= camp._id %>/page/<%= Number(currentPageNum) + 1 %>">Next</a></li>
+							<% } %>
+						</ul>
+					</section>
+				<% } %>
 			</div>
 		</div>
 	</div>

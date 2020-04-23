@@ -1,5 +1,5 @@
 <%- include("../partials/header") %>
-<div class="jumbotron mt-3 mb-3">
+<div class="jumbotron mt-3 mb-3 text-center">
 	<h1 class="display-4">Welcome to Yelp Camp!</h1>
 	<p class="lead">Enjoy our wide collection of different campgrounds</p>
 	<a class="btn btn-primary btn-lg" href="/campgrounds/new" role="button">Add New Campground</a>
@@ -19,15 +19,15 @@
 				<i class="fas fa-filter mr-2"></i>
 				keyword: <%= query %>
 				<a href="/campgrounds/page/1" class="btn btn-danger btn-sm ml-2">Clear Filter</a>
-				<span class="float-right"><%= numCamps %> <%= numCamps > 1 ? 'results' : 'result' %></span>
+				<p class="mt-2 mt-sm-0 text-right float-sm-right"><%= numCamps %> <%= numCamps > 1 ? 'results' : 'result' %></p>
 			<% } else { %>
-				<span><%= numCamps %> camps in total</span>
-			<% }%>
+				<p class="text-center"><strong>Total Camps: <%= numCamps %></strong></p>
+			<% } %>
 		</div>
-	   <div class="row justify-content-between text-center align-items-center">	 
+	   <div class="row justify-content-between justify-content-lg-start text-center align-items-center">	 
 	<% } %>
 	<% camps.forEach(function(camp){ %>
-		<div class="col-sm-6 col-md-5 col-lg-4 mb-3 d-flex align-self-stretch">
+		<div class="col-sm-6 col-md-5 col-lg-4 mb-3 d-flex align-self-stretch justify-content-center">
 			<div class="card">
 				<img src="<%= camp.imageUrl %>" class="card-img-top">
 				<div class="card-body">
@@ -43,13 +43,13 @@
 						<span><%= camp.comments.length %></span>
 						<i class="fas fa-comments ml-1"></i>
 					</div>
-					<a class="btn btn-md btn-danger" href="/campgrounds/<%= camp._id %>">Read More</a>
+					<a class="btn btn-md btn-danger" href="/campgrounds/<%= camp._id %>/comments/page/1">Read More</a>
 				</div>
 			</div>	
 		</div>
 	<% }); %>
 	</div>
-	<% var numPages = Math.ceil(numCamps / 1) %>
+	<% var numPages = Math.ceil(numCamps / 6) %>
 	<% if (numPages > 0) { %>
 		<div class="row justify-content-center mt-3">
 			<ul class="pagination">
@@ -58,16 +58,16 @@
 				<% } %>
 				<% var i = (Number(currentPageNum) > 5 ? Number(currentPageNum) - 4 : 1) %>
 				<% if (i !== 1) { %>
-					<li class="page-item disabled"><a class="page-link">...</a></li>
+					<li class="page-item"><a class="page-link">...</a></li>
 				<% } %>
 				<% for (; i <= (Number(currentPageNum) + 4) && i <= numPages; i++) { %>
 					<% if (i == currentPageNum) { %>
 						<li class="page-item active"><a class="page-link"><%= i %></a></li>
 					<% } else { %>
-						<li><a class="page-link" href="/campgrounds/page/<%= i %><%= searched ? '?search=' + query : '' %>"><%= i %></a></li>
+						<li class="page-item"><a class="page-link" href="/campgrounds/page/<%= i %><%= searched ? '?search=' + query : '' %>"><%= i %></a></li>
 					<% } %>
 					<% if (i == Number(currentPageNum) + 4 && i < numPages) { %>
-						<li class="page-item disabled"><a class="page-link">...</a></li>
+						<li class="page-item"><a class="page-link">...</a></li>
 					<% } %>
 				<% } %>
 				<% if (Number(currentPageNum) + 1 <= numPages) { %>

@@ -1,11 +1,11 @@
-const express    = require('express'),
-      router     = express.Router(),
-      Camp       = require('../models/camp'),
-      User       = require('../models/user'),
-      middleware = require('../middleware/index'),
-      cloudinary = require('./utils/cloudinaryConfig'),
-      upload     = require('./utils/multerConfig'),
-      mongoose   = require('mongoose');
+const express = require('express'),
+	router = express.Router(),
+	Camp = require('../models/camp'),
+	User = require('../models/user'),
+	middleware = require('../middleware/index'),
+	cloudinary = require('./utils/cloudinaryConfig'),
+	upload = require('./utils/multerConfig'),
+	mongoose = require('mongoose');
 
 router.post(
 	'/',
@@ -13,21 +13,21 @@ router.post(
 	upload.single('avatar'),
 	async (req, res) => {
 		try {
-			const userId                   = new mongoose.Types.ObjectId();
-			const userPassword             = req.body.newUser.password;
-			      req.body.newUser.isAdmin = req.body.newUser.code === process.env.ADMINCODE;
+			const userId = new mongoose.Types.ObjectId();
+			const userPassword = req.body.newUser.password;
+			req.body.newUser.isAdmin = req.body.newUser.code === process.env.ADMINCODE;
 			delete req.body.newUser.code;
 			delete req.body.newUser.password;
-			      req.body.newUser._id = userId;
-			const result               = await cloudinary.uploader.upload(req.file.path, {
+			req.body.newUser._id = userId;
+			const result = await cloudinary.uploader.upload(req.file.path, {
 				public_id: userId,
-				eager    : [ { width: 350, height: 250, crop: 'scale', quality: '100' } ]
+				eager: [ { width: 350, height: 250, crop: 'scale', quality: '100' } ]
 			});
-			      req.body.newUser.avatarUrl = result.eager[0].secure_url;
-			const user                       = await User.register(req.body.newUser, userPassword);
+			req.body.newUser.avatarUrl = result.eager[0].secure_url;
+			const user = await User.register(req.body.newUser, userPassword);
 			req.login(user, () => {
 				req.flash('success', `Welcome to Yelp Camp ${user.name}!`);
-				return res.redirect('/campgrounds');
+				return res.redirect('/campgrounds/page/1');
 			});
 		} catch (e) {
 			req.flash('error', e.message);
@@ -50,7 +50,7 @@ router.get('/:userId', async (req, res) => {
 		return res.render('user/show', { campCreator: user, usersCamps });
 	} catch (e) {
 		req.flash('error', 'No user found');
-		return res.redirect('/campgrounds');
+		return res.redirect('/campgrounds/page/1');
 	}
 });
 
@@ -73,11 +73,11 @@ router.put(
 				cloudinary.uploader.destroy(user._id);
 				const result = await cloudinary.uploader.upload(req.file.path, {
 					public_id: user._id,
-					eager    : [ { width: 350, height: 250, crop: 'scale', quality: '100' } ]
+					eager: [ { width: 350, height: 250, crop: 'scale', quality: '100' } ]
 				});
 				req.body.user.avatarUrl = result.eager[0].secure_url;
 			}
-			if(req.user.googleId === "-1"){
+			if (req.user.googleId === '-1') {
 				user.email !== req.body.user.email ? (hasChangedEmail = true) : (hasChangedEmail = false);
 				await user.updateOne({ $set: req.body.user });
 				if (hasChangedEmail) {
@@ -103,36 +103,46 @@ router.delete('/:userId', middleware.isLoggedIn, middleware.hasProfileAuth, asyn
 		cloudinary.uploader.destroy(user._id);
 		user.remove();
 		req.flash('success', 'Account has been closed successfully!');
-		return res.redirect('/campgrounds');
+		return res.redirect('/campgrounds/page/1');
 	} catch (e) {
 		req.flash('error', 'Cannot delete account at this time. Please try again later.');
 		return res.redirect(`/users/${req.params.userId}`);
 	}
 });
 
-router.get('/:userId/changePassword', middleware.isLoggedIn, middleware.hasGoogleAccount, middleware.hasProfileAuth, (req, res) =>
-	res.render('user/changePassword', { userId: req.params.userId })
+router.get(
+	'/:userId/changePassword',
+	middleware.isLoggedIn,
+	middleware.hasGoogleAccount,
+	middleware.hasProfileAuth,
+	(req, res) => res.render('user/changePassword', { userId: req.params.userId })
 );
 
-router.post('/:userId/changePassword', middleware.isLoggedIn, middleware.hasGoogleAccount, middleware.hasProfileAuth, async (req, res) => {
-	try {
-		const user = await User.findById(req.params.userId);
-		if (req.body.newPass === req.body.confirmNewPass) {
-			return user.changePassword(req.body.currentPass, req.body.newPass, (err) => {
-				if (err) {
-					req.flash('error', 'The current password you entered was wrong.');
-					return res.redirect(`/users/${req.params.userId}/changePassword`);
-				}
-				req.flash('success', 'Password has been succesfully changed.');
-				return res.redirect(`/users/${req.params.userId}`);
-			});
+router.post(
+	'/:userId/changePassword',
+	middleware.isLoggedIn,
+	middleware.hasGoogleAccount,
+	middleware.hasProfileAuth,
+	async (req, res) => {
+		try {
+			const user = await User.findById(req.params.userId);
+			if (req.body.newPass === req.body.confirmNewPass) {
+				return user.changePassword(req.body.currentPass, req.body.newPass, (err) => {
+					if (err) {
+						req.flash('error', 'The current password you entered was wrong.');
+						return res.redirect(`/users/${req.params.userId}/changePassword`);
+					}
+					req.flash('success', 'Password has been succesfully changed.');
+					return res.redirect(`/users/${req.params.userId}`);
+				});
+			}
+			req.flash('error', 'Please make sure passwords match');
+			return res.redirect(`/users/${req.params.userId}/changePassword`);
+		} catch (e) {
+			req.flash('error', 'No, user found.');
+			return res.redirect('/campgrounds/page/1');
 		}
-		req.flash('error', 'Please make sure passwords match');
-		return res.redirect(`/users/${req.params.userId}/changePassword`);
-	} catch (e) {
-		req.flash('error', 'No, user found.');
-		return res.redirect('/campgrounds');
 	}
-});
+);
 
 module.exports = router;

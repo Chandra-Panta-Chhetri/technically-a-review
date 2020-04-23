@@ -14,18 +14,18 @@ router.get('/page/:currentPageNum', async (req, res) => {
 	var camps,
 		page = req.params.currentPageNum || 1,
 		skipNum;
-	const perPage = 1;
+	const perPage = 6;
 	try {
 		if (req.query.search) {
 			const regex = new RegExp(helper.escapeRegex(req.query.search), 'gi');
 			const numCampsFiltered = await Camp.find({
 				$or: [ { name: regex } ]
 			}).countDocuments();
-			if (Number(page) <= 0 || Number(page) > numCampsFiltered) {
+			if (Number(page) <= 0 || Number(page) > Math.ceil(numCampsFiltered / perPage)) {
 				return res.redirect('/campgrounds/page/1');
 			}
 			skipNum = perPage * page - perPage;
-			camps = await Camp.find({ $or: [ { name: regex }, { 'author.name': regex } ] })
+			camps = await Camp.find({ $or: [ { name: regex } ] })
 				.sort({ updatedAt: 'desc' })
 				.skip(skipNum)
 				.limit(perPage)
@@ -41,7 +41,7 @@ router.get('/page/:currentPageNum', async (req, res) => {
 			});
 		}
 		const numCamps = await Camp.countDocuments();
-		if (Number(page) <= 0 || Number(page) > numCamps) {
+		if (Number(page) <= 0 || Number(page) > Math.ceil(numCamps / perPage)) {
 			return res.redirect('/campgrounds/page/1');
 		}
 		skipNum = perPage * page - perPage;
@@ -80,31 +80,13 @@ router.post(
 		} catch (e) {
 			req.flash('error', 'Cannot create a camp at this time. Please try again later.');
 		}
-		return res.redirect('/campgrounds');
+		return res.redirect('/campgrounds/page/1');
 	},
 	(err, req, res, next) => {
 		req.flash('error', err);
 		res.redirect('/campgrounds/new');
 	}
 );
-
-router.get('/:campId', async (req, res) => {
-	try {
-		const comments = await Comment.find({ campId: req.params.campId });
-		const camp = await Camp.findById(req.params.campId);
-		if (!camp) {
-			throw new Error();
-		}
-		if (req.user) {
-			const comment = await middleware.commentStatus(req.user._id, req.params.campId);
-			return res.render('campground/show', { camp, comments, commentId: comment === null ? -1 : comment._id });
-		}
-		return res.render('campground/show', { camp, comments, commentId: -1 });
-	} catch (e) {
-		req.flash('error', 'Sorry, no campground found.');
-		return res.redirect('/campgrounds/page/1');
-	}
-});
 
 router.get('/:campId/edit', middleware.isLoggedIn, middleware.hasCampAuth, async (req, res) => {
 	const camp = await Camp.findById(req.params.campId);
@@ -129,10 +111,10 @@ router.put(
 			}
 			await camp.updateOne({ $set: req.body.camp });
 			req.flash('success', 'Camp Successfully Updated!');
-			return res.redirect(`/campgrounds/${req.params.campId}`);
+			return res.redirect(`/campgrounds/${req.params.campId}/comments/page/1`);
 		} catch (e) {
 			req.flash('error', 'Cannot update at this time. Please try again later.');
-			return res.redirect('/campgrounds');
+			return res.redirect('/campgrounds/page/1');
 		}
 	},
 	(err, req, res, next) => {
@@ -147,10 +129,10 @@ router.delete('/:campId', middleware.isLoggedIn, middleware.hasCampAuth, async (
 		cloudinary.uploader.destroy(camp._id);
 		camp.remove();
 		req.flash('success', 'Campground deleted successfully!');
-		return res.redirect('/campgrounds');
+		return res.redirect('/campgrounds/page/1');
 	} catch (e) {
 		req.flash('error', 'Cannot delete at this time. Please try again later.');
-		res.redirect(`/campgrounds/${req.params.campId}`);
+		res.redirect(`/campgrounds/${req.params.campId}/comments/page/1`);
 	}
 });
 

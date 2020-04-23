@@ -24,7 +24,7 @@ middleware.hasGoogleAccount = (req, res, next) => {
 		return next();
 	}
 	req.flash('error', "You cannot change your password as you've signed in through Google");
-	res.redirect('/campgrounds');
+	res.redirect('/campgrounds/page/1');
 };
 
 middleware.hasCampAuth = async (req, res, next) => {
@@ -36,10 +36,10 @@ middleware.hasCampAuth = async (req, res, next) => {
 			return next();
 		}
 		req.flash('error', 'Only the camp creator has authorization to do that.');
-		return res.redirect(`/campgrounds/${req.params.campId}`);
+		return res.redirect(`/campgrounds/${req.params.campId}/comments/page/1`);
 	} catch (e) {
 		req.flash('error', 'Sorry, no campground found.');
-		return res.redirect('/campgrounds');
+		return res.redirect('/campgrounds/page/1');
 	}
 };
 
@@ -67,7 +67,7 @@ middleware.hasCommented = async function(req, res, next) {
 		return next();
 	}
 	req.flash('error', 'Seems you have already commented. You can only edit or delete your comment.');
-	return res.redirect(`/campgrounds/${req.params.campId}`);
+	return res.redirect(`/campgrounds/${req.params.campId}/comments/page/1`);
 };
 
 middleware.hasProfileAuth = async (req, res, next) => {
@@ -82,7 +82,7 @@ middleware.hasProfileAuth = async (req, res, next) => {
 		return res.redirect(`/users/${req.params.userId}`);
 	} catch (e) {
 		req.flash('error', 'Sorry, no user found.');
-		return res.redirect('/campgrounds');
+		return res.redirect('/campgrounds/page/1');
 	}
 };
 
