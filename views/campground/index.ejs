@@ -4,14 +4,14 @@
 	<p class="lead">Enjoy our wide collection of different campgrounds</p>
 	<a class="btn btn-primary btn-lg" href="/campgrounds/new" role="button">Add New Campground</a>
 </div>
-<form action="/campgrounds/page/1" method="GET">
+<form action="/campgrounds" method="GET">
 	<div class="row justify-content-center mt-4">
 		<div class="col-12 d-flex flex-column flex-md-row">
 			<input class="form-control" type="search" name="search" placeholder="search camps by keyword"
 				value="<%= searched && query.length > 0 ? query : '' %>">
 			<button class="btn btn-success ml-0 ml-md-2 mt-2 mt-md-0">Search</button>
 			<% if(searched && query.length > 0){ %>
-			<a href="/campgrounds/page/1" class="btn btn-danger ml-0 ml-md-2 mt-2 mt-md-0 clear-search">Clear Search</a>
+			<a href="/campgrounds" class="btn btn-danger ml-0 ml-md-2 mt-2 mt-md-0 clear-search">Clear Search</a>
 			<% } %>
 		</div>
 	</div>
@@ -44,7 +44,7 @@
 					<span><%= camp.comments.length %></span>
 					<i class="fas fa-comments ml-1"></i>
 				</div>
-				<a class="btn btn-md btn-danger" href="/campgrounds/<%= camp._id %>/comments/page/1">Read
+				<a class="btn btn-md btn-danger" href="/campgrounds/<%= camp._id %>/comments">Read
 					More</a>
 			</div>
 		</div>
@@ -57,7 +57,7 @@
 	<ul class="pagination">
 		<% if (Number(currentPageNum) - 1 > 0) { %>
 		<li class="page-item"><a class="page-link"
-				href="/campgrounds/page/<%= Number(currentPageNum) - 1 %><%= searched ? '?search=' + query : '' %>">Prev</a>
+				href="/campgrounds/?page=<%= Number(currentPageNum) - 1 %><%= searched ? '&search=' + query : '' %>">Prev</a>
 		</li>
 		<% } %>
 		<% var i = (Number(currentPageNum) > 5 ? Number(currentPageNum) - 4 : 1) %>
@@ -69,7 +69,7 @@
 		<li class="page-item active"><a class="page-link"><%= i %></a></li>
 		<% } else { %>
 		<li class="page-item"><a class="page-link"
-				href="/campgrounds/page/<%= i %><%= searched ? '?search=' + query : '' %>"><%= i %></a></li>
+				href="/campgrounds/?page=<%= i %><%= searched ? '&search=' + query : '' %>"><%= i %></a></li>
 		<% } %>
 		<% if (i == Number(currentPageNum) + 4 && i < numPages) { %>
 		<li class="page-item"><a class="page-link">...</a></li>
@@ -77,7 +77,7 @@
 		<% } %>
 		<% if (Number(currentPageNum) + 1 <= numPages) { %>
 		<li class="page-item"><a class="page-link"
-				href="/campgrounds/page/<%= Number(currentPageNum) + 1 %><%= searched ? '?search=' + query : '' %>">Next</a>
+				href="/campgrounds/?page=<%= Number(currentPageNum) + 1 %><%= searched ? '&search=' + query : '' %>">Next</a>
 		</li>
 		<% } %>
 	</ul>
