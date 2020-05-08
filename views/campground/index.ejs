@@ -28,24 +28,28 @@
 <% } %>
 <div class="row justify-content-between justify-content-lg-start text-center align-items-center">
 	<% camps.forEach(function(camp){ %>
-	<div class="col-sm-6 col-md-5 col-lg-4 mb-3 d-flex align-self-stretch justify-content-center">
-		<div class="card">
+	<div class="col-sm-6 col-md-5 col-lg-4 mb-3 d-flex align-self-stretch justify-content-center camp-card-col">
+		<div class="card" id="<%= camp._id %>">
 			<img src="<%= camp.imageUrl %>" class="card-img-top">
 			<div class="card-body">
 				<h5 class="card-title"><%= camp.name %></h5>
-				<% for(var i = 1; i <= 5; i++){ %>
+				<% for(var i = 1; i <= 5 && camp.avgRating != 0; i++){ %>
 				<% if(i <= camp.avgRating){ %>
 				<i class="fas fa-star text-warning"></i>
 				<% }else{ %>
 				<i class="far fa-star"></i>
 				<% } %>
 				<% } %>
+				<% if(camp.comments.length){ %>
 				<div class="mt-2 mb-2">
 					<span><%= camp.comments.length %></span>
 					<i class="fas fa-comments ml-1"></i>
 				</div>
-				<a class="btn btn-md btn-danger" href="/campgrounds/<%= camp._id %>/comments">Read
-					More</a>
+				<% } else { %>
+				<div class="mt-2 mb-2">
+					<h6 class="sub-heading">No Reviews Yet</h6>
+				</div>
+				<% } %>
 			</div>
 		</div>
 	</div>
@@ -57,7 +61,8 @@
 	<ul class="pagination">
 		<% if (Number(currentPageNum) - 1 > 0) { %>
 		<li class="page-item"><a class="page-link"
-				href="/campgrounds/?page=<%= Number(currentPageNum) - 1 %><%= searched ? '&search=' + query : '' %>">Prev</a>
+				href="/campgrounds/?page=<%= Number(currentPageNum) - 1 %><%= searched ? '&search=' + query : '' %>"><i
+					class="fas fa-arrow-alt-circle-left"></i></a>
 		</li>
 		<% } %>
 		<% var i = (Number(currentPageNum) > 5 ? Number(currentPageNum) - 4 : 1) %>
@@ -77,10 +82,13 @@
 		<% } %>
 		<% if (Number(currentPageNum) + 1 <= numPages) { %>
 		<li class="page-item"><a class="page-link"
-				href="/campgrounds/?page=<%= Number(currentPageNum) + 1 %><%= searched ? '&search=' + query : '' %>">Next</a>
+				href="/campgrounds/?page=<%= Number(currentPageNum) + 1 %><%= searched ? '&search=' + query : '' %>"><i
+					class="fas fa-arrow-alt-circle-right"></i>
+			</a>
 		</li>
 		<% } %>
 	</ul>
 </div>
 <% } %>
+<script src="/js/agency.js"></script>
 <%- include("../partials/footer") %>

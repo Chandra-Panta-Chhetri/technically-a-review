@@ -1,73 +1,77 @@
 .border img {
-	width: 100%;
+  width: 100%;
 }
 
 body {
-	display: flex;
-	flex-direction: column;
-	min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 nav + div {
-	flex-grow: 1;
+  flex-grow: 1;
 }
 
 hr {
-	width: 100%;
-	display: flex;
+  width: 100%;
+  display: flex;
 }
 
 a + form {
-	display: inline;
+  display: inline;
 }
 
 .active-page {
-	background: lightgray;
+  background: lightgray;
 }
 
 footer {
-	background: #f8f9fa;
-	width: 100%;
-	height: 70px;
+  background: #f8f9fa;
+  width: 100%;
+  height: 70px;
 }
 
 footer p {
-	margin: 20px 0;
+  margin: 20px 0;
 }
 
 h1 + img {
-	width: 90%;
+  width: 90%;
 }
 
+.camp-card-col .card:hover {
+  transform: scale(1.05);
+  cursor: pointer;
+}
 .card-body i {
-	color: gray;
-	font-size: 30px;
+  color: gray;
+  font-size: 30px;
 }
 
 .card-body span {
-	font-size: 25px;
-	font-weight: bold;
+  font-size: 25px;
+  font-weight: bold;
 }
 
 ul {
-	list-style: none;
+  list-style: none;
 }
 
 .input-group-append > a {
-	background: #f0f0f0;
-	border: 0.7px solid #ced4da;
-	border-left: none;
+  background: #f0f0f0;
+  border: 0.7px solid #ced4da;
+  border-left: none;
 }
 
 .input-group-append > a:hover {
-	background: inherit;
+  background: inherit;
 }
 
 li.nav-item > img {
-	width: 10%;
-	height: 80%;
+  width: 10%;
+  height: 80%;
 }
 
 .clear-search {
-	white-space: nowrap;
+  white-space: nowrap;
 }

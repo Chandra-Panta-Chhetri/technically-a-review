@@ -20,8 +20,8 @@
 					</strong>
 				</h5>
 				<p class="mt-4 mt-sm-3"><%= camp.description %></p>
-				<p>Created by: <a href="/users/<%= camp.author.id %>"><%= camp.author.name %></a></p>
-				<p>Updated: <%= moment(camp.updatedAt).fromNow() %></p>
+				<p>Submitted By <a href="/users/<%= camp.author.id %>"><%= camp.author.name %></a> on
+					<%= moment(camp.createdAt).format("MMM Do, YYYY") %></p>
 				<% if(currentUser && (camp.author.id.equals(currentUser._id) || currentUser.isAdmin)){ %>
 				<a class="btn btn-xs btn-warning" href="/campgrounds/<%= camp._id %>/edit">Edit</a>
 				<form action="/campgrounds/<%= camp._id %>/?_method=DELETE" method="POST">
@@ -82,7 +82,8 @@
 				<ul class="pagination">
 					<% if (Number(currentPageNum) - 1 > 0) { %>
 					<li class="page-item"><a class="page-link"
-							href="/campgrounds/<%= camp._id %>/comments/?page=<%= Number(currentPageNum) - 1 %>">Prev</a>
+							href="/campgrounds/<%= camp._id %>/comments/?page=<%= Number(currentPageNum) - 1 %>"><i
+								class="fas fa-arrow-alt-circle-left"></i></a>
 					</li>
 					<% } %>
 					<% var i = (Number(currentPageNum) > 5 ? Number(currentPageNum) - 4 : 1) %>
@@ -102,7 +103,8 @@
 					<% } %>
 					<% if (Number(currentPageNum) + 1 <= numPages) { %>
 					<li class="page-item"><a class="page-link"
-							href="/campgrounds/<%= camp._id %>/comments/?page=<%= Number(currentPageNum) + 1 %>">Next</a>
+							href="/campgrounds/<%= camp._id %>/comments/?page=<%= Number(currentPageNum) + 1 %>"><i
+								class="fas fa-arrow-alt-circle-right"></i></a>
 					</li>
 					<% } %>
 				</ul>
