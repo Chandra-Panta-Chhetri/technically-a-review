@@ -3,7 +3,8 @@ const express = require("express"),
   Camp = require("../models/camp"),
   Comment = require("../models/comment"),
   middleware = require("../middleware/index"),
-  helper = require("./helpers/index");
+  helper = require("./helpers/index"),
+  pusher = require("./utils/pusherConfig");
 
 router.get("/", async (req, res) => {
   try {
@@ -88,7 +89,11 @@ router.post(
       const campComments = await Comment.find({ campId: camp._id });
       camp.avgRating = helper.calculateAvgRating(campComments);
       await camp.save();
-      req.flash("success", "Comment successfully added.");
+      req.flash("success", "Comment successfully created.");
+      pusher.trigger("notifications", "changed_post_or_comment", {
+        message: `${req.user.name} has just left a new review in ${camp.name}. Come check it out!`,
+        url: `/campgrounds/${camp._id}/comments`
+      });
       return res.redirect(`/campgrounds/${req.params.campId}/comments`);
     } catch (e) {
       req.flash("error", "No campground found.");
@@ -148,6 +153,9 @@ router.delete(
       camp.avgRating = helper.calculateAvgRating(campComments);
       await camp.save();
       req.flash("success", "Comment was successfully deleted!");
+      pusher.trigger("notifications", "changed_post_or_comment", {
+        message: `${req.user.name} has removed their comment for ${camp.name}.`
+      });
     } catch (e) {
       req.flash("error", "Cannot delete comment. Please try again later.");
     }

@@ -1,12 +1,12 @@
 const express = require("express"),
   router = express.Router(),
   Camp = require("../models/camp"),
-  Comment = require("../models/comment"),
   middleware = require("../middleware/index"),
   cloudinary = require("./utils/cloudinaryConfig"),
   upload = require("./utils/multerConfig"),
   mongoose = require("mongoose"),
-  helper = require("./helpers/index");
+  helper = require("./helpers/index"),
+  pusher = require("./utils/pusherConfig");
 
 router.get("/", async (req, res) => {
   var camps,
@@ -88,6 +88,10 @@ router.post(
       req.body.camp._id = campId;
       await Camp.create(req.body.camp);
       req.flash("success", "Campground successfully created!");
+      pusher.trigger("notifications", "changed_post_or_comment", {
+        message: `A new campground has just been created by ${req.user.name}. Come check it out!`,
+        url: `/campgrounds/${campId}/comments`
+      });
     } catch (e) {
       req.flash(
         "error",
@@ -130,6 +134,10 @@ router.put(
       }
       await camp.updateOne({ $set: req.body.camp });
       req.flash("success", "Camp Successfully Updated!");
+      pusher.trigger("notifications", "changed_post_or_comment", {
+        message: `${req.body.camp.name} has just been updated. Come check it out!`,
+        url: `/campgrounds/${req.params.campId}/comments`
+      });
       return res.redirect(`/campgrounds/${req.params.campId}/comments`);
     } catch (e) {
       req.flash("error", "Cannot update at this time. Please try again later.");
@@ -149,9 +157,13 @@ router.delete(
   async (req, res) => {
     try {
       const camp = await Camp.findById(req.params.campId);
+      const campName = camp.name;
       cloudinary.uploader.destroy(camp._id);
       camp.remove();
       req.flash("success", "Campground deleted successfully!");
+      pusher.trigger("notifications", "changed_post_or_comment", {
+        message: `${campName} has just been deleted.`
+      });
       return res.redirect("/campgrounds");
     } catch (e) {
       req.flash("error", "Cannot delete at this time. Please try again later.");
