@@ -1,28 +1,27 @@
 <%- include("../partials/header") %>
 <div class="row pt-5 text-center">
 	<div class="col-12 col-lg-5 order-2 order-lg-1 mt-3 mt-lg-0">
-		<h3>Created Campgrounds:</h3>
-		<% if(usersCamps.length == 0) { %>
-		<p>No camps created yet.</p>
-		<% } %>
+		<% if(!usersTechProducts.length == 0) { %>
+		<h3>Created Tech Products:</h3>
 		<ul class="pl-0">
-			<% usersCamps.forEach(function(camp){ %>
+			<% usersTechProducts.forEach(function(techProduct){ %>
 			<li>
-				<a href="/campgrounds/<%= camp._id %>"><%= camp.name %></a> - Created
-				<%= moment(camp.createdAt).fromNow() %>
+				<a href="/techProducts/<%= techProduct._id %>/reviews"><%= techProduct.name %></a> - Created
+				<%= moment(techProduct.createdAt).fromNow() %>
 			</li>
 			<% });%>
 		</ul>
+		<% } %>
 	</div>
 	<div class="col-12 col-lg-7 order-1 order-lg-2">
-		<h1><%= campCreator.fullName %></h1>
-		<img src="<%= campCreator.avatarUrl %>">
-		<% if(currentUser && currentUser._id.equals(campCreator._id)) { %>
+		<h1><%= user.fullName %></h1>
+		<img src="<%= user.avatarUrl %>">
+		<% if(currentUser && currentUser._id.equals(user._id)) { %>
 		<div class="d-flex flex-column align-items-center">
 			<div>
-				<a href="/users/<%= campCreator._id %>/edit" class="mt-2 btn btn-warning">Edit Profile</a>
+				<a href="/users/<%= user._id %>/edit" class="mt-2 btn btn-warning">Edit Profile</a>
 				<% if(currentUser.googleId === "-1"){ %>
-				<a href="/users/<%= campCreator._id %>/changePassword" class="mt-2 btn btn-primary">Change Password</a>
+				<a href="/users/<%= user._id %>/changePassword" class="mt-2 btn btn-primary">Change Password</a>
 				<% }%>
 			</div>
 			<button class="btn btn-danger mt-2 mt-md-3" data-toggle="modal" data-target="#closeAccount">Close
@@ -40,7 +39,7 @@
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
-						<form action="/users/<%= campCreator._id %>?_method=DELETE" method="POST">
+						<form action="/users/<%= user._id %>?_method=DELETE" method="POST">
 							<button type="submit" class="btn btn-danger">Yes, I'm sure</button>
 						</form>
 					</div>

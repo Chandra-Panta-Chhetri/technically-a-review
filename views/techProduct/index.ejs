@@ -1,17 +1,17 @@
 <%- include("../partials/header") %>
 <div class="jumbotron mt-3 mb-3 text-center">
-	<h1 class="display-4">Welcome to Yelp Camp!</h1>
-	<p class="lead">Enjoy our wide collection of different campgrounds</p>
-	<a class="btn btn-primary btn-lg" href="/campgrounds/new" role="button">Add New Campground</a>
+	<h1 class="display-4">Welcome to TECHnically A Review!</h1>
+	<p class="lead">Enjoy our wide collection of tech product reviews</p>
+	<a class="btn btn-primary btn-lg" href="/techProducts/new" role="button">Add New Tech Product</a>
 </div>
-<form action="/campgrounds" method="GET">
+<form action="/techProducts" method="GET">
 	<div class="row justify-content-center mt-4">
 		<div class="col-12 d-flex flex-column flex-md-row">
-			<input class="form-control" type="search" name="search" placeholder="search camps by keyword"
+			<input class="form-control" type="search" name="search" placeholder="search tech products by keyword(s)"
 				value="<%= searched && query.length > 0 ? query : '' %>">
 			<button class="btn btn-success ml-0 ml-md-2 mt-2 mt-md-0">Search</button>
 			<% if(searched && query.length > 0){ %>
-			<a href="/campgrounds" class="btn btn-danger ml-0 ml-md-2 mt-2 mt-md-0 clear-search">Clear Search</a>
+			<a href="/techProducts" class="btn btn-danger ml-0 ml-md-2 mt-2 mt-md-0 clear-search">Clear Search</a>
 			<% } %>
 		</div>
 	</div>
@@ -19,49 +19,47 @@
 <% if (searched && query.length > 0) { %>
 <p class="mt-2 text-center text-md-right">
 	<strong>
-		<%= numCamps %>
-		<%= numCamps > 1 || numCamps === 0 ? 'results' : 'result' %>
+		<%= numTechProducts %>
+		<%= numTechProducts > 1 || numTechProducts === 0 ? 'results' : 'result' %>
 	</strong>
 </p>
 <% } else { %>
-<p class="text-center mt-2"><strong>Total Camps: <%= numCamps %></strong></p>
+<p class="text-center mt-2"><strong>Total Tech Products: <%= numTechProducts %></strong></p>
 <% } %>
 <div class="row justify-content-between justify-content-lg-start text-center align-items-center">
-	<% camps.forEach(function(camp){ %>
-	<div class="col-sm-6 col-md-5 col-lg-4 mb-3 d-flex align-self-stretch justify-content-center camp-card-col">
-		<div class="card" id="<%= camp._id %>">
-			<img src="<%= camp.imageUrl %>" class="card-img-top">
+	<% techProducts.forEach(function(techProduct){ %>
+	<div class="col-sm-6 col-md-5 col-lg-4 mb-3 d-flex align-self-stretch justify-content-center techProduct-card-col">
+		<div class="card" id="<%= techProduct._id %>">
+			<img src="<%= techProduct.imageUrl %>" class="card-img-top">
 			<div class="card-body">
-				<h5 class="card-title"><%= camp.name %></h5>
-				<% for(var i = 1; i <= 5 && camp.avgRating != 0; i++){ %>
-				<% if(i <= camp.avgRating){ %>
+				<h5 class="card-title"><%= techProduct.name %></h5>
+				<% for(var i = 1; i <= 5 && techProduct.reviews.length != 0; i++){ %>
+				<% if(i <= techProduct.avgRating){ %>
 				<i class="fas fa-star text-warning"></i>
 				<% }else{ %>
 				<i class="far fa-star"></i>
 				<% } %>
 				<% } %>
-				<% if(camp.comments.length){ %>
 				<div class="mt-2 mb-2">
-					<span><%= camp.comments.length %></span>
+					<% if(techProduct.reviews.length){ %>
+					<span><%= techProduct.reviews.length %></span>
 					<i class="fas fa-comments ml-1"></i>
-				</div>
-				<% } else { %>
-				<div class="mt-2 mb-2">
+					<% } else { %>
 					<h6 class="sub-heading">No Reviews Yet</h6>
+					<% } %>
 				</div>
-				<% } %>
 			</div>
 		</div>
 	</div>
 	<% }); %>
 </div>
-<% var numPages = Math.ceil(numCamps / 6) %>
+<% var numPages = Math.ceil(numTechProducts / 6) %>
 <% if (numPages > 0) { %>
 <div class="row justify-content-center mt-3">
 	<ul class="pagination">
 		<% if (Number(currentPageNum) - 1 > 0) { %>
 		<li class="page-item"><a class="page-link"
-				href="/campgrounds/?page=<%= Number(currentPageNum) - 1 %><%= searched ? '&search=' + query : '' %>"><i
+				href="/techProducts/?page=<%= Number(currentPageNum) - 1 %><%= searched ? '&search=' + query : '' %>"><i
 					class="fas fa-arrow-alt-circle-left"></i></a>
 		</li>
 		<% } %>
@@ -74,7 +72,7 @@
 		<li class="page-item active"><a class="page-link"><%= i %></a></li>
 		<% } else { %>
 		<li class="page-item"><a class="page-link"
-				href="/campgrounds/?page=<%= i %><%= searched ? '&search=' + query : '' %>"><%= i %></a></li>
+				href="/techProducts/?page=<%= i %><%= searched ? '&search=' + query : '' %>"><%= i %></a></li>
 		<% } %>
 		<% if (i == Number(currentPageNum) + 4 && i < numPages) { %>
 		<li class="page-item"><a class="page-link">...</a></li>
@@ -82,7 +80,7 @@
 		<% } %>
 		<% if (Number(currentPageNum) + 1 <= numPages) { %>
 		<li class="page-item"><a class="page-link"
-				href="/campgrounds/?page=<%= Number(currentPageNum) + 1 %><%= searched ? '&search=' + query : '' %>"><i
+				href="/techProducts/?page=<%= Number(currentPageNum) + 1 %><%= searched ? '&search=' + query : '' %>"><i
 					class="fas fa-arrow-alt-circle-right"></i>
 			</a>
 		</li>

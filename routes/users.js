@@ -1,11 +1,10 @@
-const express = require("express"),
-  router = express.Router(),
-  Camp = require("../models/camp"),
-  User = require("../models/user"),
-  middleware = require("../middleware/index"),
-  cloudinary = require("./utils/cloudinaryConfig"),
-  upload = require("./utils/multerConfig"),
-  mongoose = require("mongoose");
+const TechProduct = require("../models/techProduct");
+const User = require("../models/user");
+const router = require("express").Router();
+const middleware = require("../middleware");
+const cloudinary = require("./configs/cloudinaryConfig");
+const upload = require("./configs/multerConfig");
+const mongoose = require("mongoose");
 
 router.post(
   "/",
@@ -27,8 +26,8 @@ router.post(
       req.body.newUser.avatarUrl = result.eager[0].secure_url;
       const user = await User.register(req.body.newUser, userPassword);
       req.login(user, () => {
-        req.flash("success", `Welcome to Yelp Camp ${user.name}!`);
-        return res.redirect("/campgrounds");
+        req.flash("success", `Welcome ${user.name}!`);
+        return res.redirect("/techProducts");
       });
     } catch (e) {
       req.flash("error", e.message);
@@ -47,18 +46,18 @@ router.get("/:userId", async (req, res) => {
     if (!user) {
       throw new Error();
     }
-    const usersCamps = await Camp.find({ "author.id": user._id });
-    return res.render("user/show", { campCreator: user, usersCamps });
+    const usersTechProducts = await TechProduct.find({ "author.id": user._id });
+    return res.render("user/show", { user, usersTechProducts });
   } catch (e) {
-    req.flash("error", "No user found");
-    return res.redirect("/campgrounds");
+    req.flash("error", "User does not exist");
+    return res.redirect("/techProducts");
   }
 });
 
 router.get(
   "/:userId/edit",
   middleware.isLoggedIn,
-  middleware.hasProfileAuth,
+  middleware.canModifyProfile,
   async (req, res) => {
     const user = await User.findById(req.params.userId);
     return res.render("user/edit", { user });
@@ -68,12 +67,11 @@ router.get(
 router.put(
   "/:userId",
   middleware.isLoggedIn,
-  middleware.hasProfileAuth,
+  middleware.canModifyProfile,
   upload.single("avatar"),
   async (req, res) => {
     try {
       const user = await User.findById(req.params.userId);
-      var hasChangedEmail;
       req.body.user.email = req.body.user.email.toLowerCase();
       if (req.file) {
         cloudinary.uploader.destroy(user._id);
@@ -83,19 +81,7 @@ router.put(
         });
         req.body.user.avatarUrl = result.eager[0].secure_url;
       }
-      if (req.user.googleId === "-1") {
-        user.email !== req.body.user.email
-          ? (hasChangedEmail = true)
-          : (hasChangedEmail = false);
-        await user.updateOne({ $set: req.body.user });
-        if (hasChangedEmail) {
-          req.flash(
-            "success",
-            "Profile successfully updated! Please sign in again for security reasons."
-          );
-          return res.redirect(`/login`);
-        }
-      }
+      await user.updateOne({ $set: req.body.user });
       req.flash("success", "Profile successfully updated!");
     } catch (e) {
       req.flash(
@@ -114,14 +100,14 @@ router.put(
 router.delete(
   "/:userId",
   middleware.isLoggedIn,
-  middleware.hasProfileAuth,
+  middleware.canModifyProfile,
   async (req, res) => {
     try {
       const user = await User.findById(req.params.userId);
       cloudinary.uploader.destroy(user._id);
-      user.remove();
+      await user.remove();
       req.flash("success", "Account has been closed successfully!");
-      return res.redirect("/campgrounds");
+      return res.redirect("/techProducts");
     } catch (e) {
       req.flash(
         "error",
@@ -136,7 +122,7 @@ router.get(
   "/:userId/changePassword",
   middleware.isLoggedIn,
   middleware.hasGoogleAccount,
-  middleware.hasProfileAuth,
+  middleware.canModifyProfile,
   (req, res) => res.render("user/changePassword", { userId: req.params.userId })
 );
 
@@ -144,7 +130,7 @@ router.post(
   "/:userId/changePassword",
   middleware.isLoggedIn,
   middleware.hasGoogleAccount,
-  middleware.hasProfileAuth,
+  middleware.canModifyProfile,
   async (req, res) => {
     try {
       const user = await User.findById(req.params.userId);
@@ -154,7 +140,7 @@ router.post(
           req.body.newPass,
           (err) => {
             if (err) {
-              req.flash("error", "The current password you entered was wrong.");
+              req.flash("error", "Current password entered was wrong.");
               return res.redirect(`/users/${req.params.userId}/changePassword`);
             }
             req.flash("success", "Password has been succesfully changed.");
@@ -165,8 +151,8 @@ router.post(
       req.flash("error", "Please make sure passwords match");
       return res.redirect(`/users/${req.params.userId}/changePassword`);
     } catch (e) {
-      req.flash("error", "No, user found.");
-      return res.redirect("/campgrounds");
+      req.flash("error", "User does not exist");
+      return res.redirect("/techProducts");
     }
   }
 );

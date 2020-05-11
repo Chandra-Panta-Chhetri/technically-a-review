@@ -1,5 +1,5 @@
 const $fileField = document.querySelector("input[type='file']");
-const $campCards = document.querySelectorAll(".card");
+const $productCardsCards = document.querySelectorAll(".card");
 
 if ($fileField != null) {
   $fileField.onchange = function () {
@@ -9,10 +9,10 @@ if ($fileField != null) {
   };
 }
 
-if ($campCards.length) {
-  $campCards.forEach((card) => {
+if ($productCardsCards.length) {
+  $productCardsCards.forEach((card) => {
     card.addEventListener("click", function () {
-      window.location.pathname = `/campgrounds/${this.id}/comments`;
+      window.location.pathname = `/techProducts/${this.id}/reviews`;
     });
   });
 }

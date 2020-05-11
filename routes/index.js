@@ -1,11 +1,10 @@
-const express = require("express"),
-  router = express.Router(),
-  passport = require("passport"),
-  User = require("../models/user"),
-  Async = require("async"),
-  nodemailer = require("nodemailer"),
-  middleware = require("../middleware/index"),
-  crypto = require("crypto");
+const User = require("../models/user");
+const Async = require("async");
+const router = require("express").Router();
+const passport = require("passport");
+const nodemailer = require("nodemailer");
+const middleware = require("../middleware");
+const crypto = require("crypto");
 
 router.get("/login", middleware.hasLoggedIn, (req, res) =>
   res.render("user/login", { pageName: "login" })
@@ -21,7 +20,7 @@ router.post(
   }),
   (req, res) => {
     req.flash("success", `Welcome back ${req.user.name}!`);
-    return res.redirect("/campgrounds");
+    return res.redirect("/techProducts");
   }
 );
 
@@ -31,13 +30,15 @@ router.get("/signup", middleware.hasLoggedIn, (req, res) =>
 
 router.get("/logout", middleware.isLoggedIn, (req, res) => {
   req.logout();
-  req.flash("success", "Successfully logged out!");
-  res.redirect("/campgrounds");
+  req.flash("success", "Logged out successfully!");
+  res.redirect("/techProducts");
 });
 
-router.get("/forgot", (req, res) => res.render("user/forgot"));
+router.get("/forgot", middleware.hasLoggedIn, (req, res) =>
+  res.render("user/forgot")
+);
 
-router.post("/forgot", (req, res) => {
+router.post("/forgot", middleware.hasLoggedIn, (req, res) => {
   Async.waterfall(
     [
       (done) => {
@@ -66,15 +67,15 @@ router.post("/forgot", (req, res) => {
         var smtpTransport = nodemailer.createTransport({
           service: "Gmail",
           auth: {
-            user: "infonodeapp@gmail.com",
-            pass: process.env.GMAILPW
+            user: process.env.GMAIL_EMAIL,
+            pass: process.env.GMAIL_PW
           }
         });
         var mailContent = `You or someone requested a password change for the user with username: ${user.email}.\nPlease click on the link below to reset your password:\nhttp://${req.headers.host}/reset/${token}\nNote: This link will expire in 15 mins.`;
         var mailOptions = {
           to: user.email,
-          from: "infonodeapp@gmail.com",
-          subject: "Yelp Camp Password Reset",
+          from: process.env.GMAIL_EMAIL,
+          subject: "TECHnically A Review Password Reset",
           text: mailContent
         };
         smtpTransport.sendMail(mailOptions, (err) => {
@@ -90,20 +91,23 @@ router.post("/forgot", (req, res) => {
   );
 });
 
-router.get("/reset/:token", async (req, res) => {
+router.get("/reset/:token", middleware.hasLoggedIn, async (req, res) => {
   try {
-    await User.findOne({
+    const user = await User.findOne({
       resetPasswordToken: req.params.token,
       resetPasswordExpires: { $gt: Date.now() }
     });
-    return res.render("user/reset", { token: req.params.token });
+    if (!user) {
+      throw new Error();
+    }
+    return res.render("user/reset", { token: user.resetPasswordToken });
   } catch (e) {
     req.flash("error", "Password reset token has expired or is invalid.");
     return res.redirect("/forgot");
   }
 });
 
-router.post("/reset/:token", (req, res) => {
+router.post("/reset/:token", middleware.hasLoggedIn, (req, res) => {
   Async.waterfall(
     [
       (done) => {
@@ -131,7 +135,7 @@ router.post("/reset/:token", (req, res) => {
                 });
               });
             } else {
-              req.flash("error", "Passwords did not match");
+              req.flash("error", "Passwords must match");
               res.redirect(`/reset/${req.params.token}`);
             }
           }
@@ -141,14 +145,14 @@ router.post("/reset/:token", (req, res) => {
         var smtpTransport = nodemailer.createTransport({
           service: "Gmail",
           auth: {
-            user: "infonodeapp@gmail.com",
-            pass: process.env.GMAILPW
+            user: process.env.GMAIL_EMAIL,
+            pass: process.env.GMAIL_PW
           }
         });
         var mailOptions = {
           to: user.email,
-          from: "infonodeapp@gmail.com",
-          subject: "Yelp Camp Password Reset",
+          from: process.env.GMAIL_EMAIL,
+          subject: "TECHnically A Review Password Changed",
           text:
             "This is a confirmation email to inform you that your password has been successfully changed!"
         };
@@ -158,7 +162,7 @@ router.post("/reset/:token", (req, res) => {
         });
       }
     ],
-    (err) => res.redirect("/campgrounds")
+    (err) => res.redirect("/techProducts")
   );
 });
 
@@ -166,6 +170,7 @@ router.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
+
 router.get(
   "/auth/google/redirect",
   passport.authenticate("google", {
@@ -173,8 +178,8 @@ router.get(
     failureMessage: "Login unsuccessful, please try again"
   }),
   (req, res) => {
-    req.flash("success", `Welcome to YelpCamp ${req.user.name}!`);
-    res.redirect("/campgrounds");
+    req.flash("success", `Welcome ${req.user.name}!`);
+    res.redirect("/techProducts");
   }
 );
 

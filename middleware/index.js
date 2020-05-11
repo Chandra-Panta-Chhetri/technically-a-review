@@ -1,7 +1,7 @@
-const middleware = {},
-  Camp = require("../models/camp"),
-  Comment = require("../models/comment"),
-  User = require("../models/user");
+const middleware = {};
+const TechProduct = require("../models/techProduct");
+const Review = require("../models/review");
+const User = require("../models/user");
 
 middleware.isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) {
@@ -16,7 +16,7 @@ middleware.hasLoggedIn = (req, res, next) => {
     return next();
   }
   req.flash("error", "Please logout before you do that.");
-  res.redirect("/campgrounds");
+  res.redirect("/techProducts");
 };
 
 middleware.hasGoogleAccount = (req, res, next) => {
@@ -25,65 +25,65 @@ middleware.hasGoogleAccount = (req, res, next) => {
   }
   req.flash(
     "error",
-    "You cannot change your password as you've signed in through Google"
+    "You cannot change your password as you've signed in through Google."
   );
-  res.redirect("/campgrounds");
+  res.redirect(`/users/${req.params.userId}`);
 };
 
-middleware.hasCampAuth = async (req, res, next) => {
+middleware.canModifyTechProduct = async (req, res, next) => {
   try {
-    const camp = await Camp.findById(req.params.campId);
-    if (!camp) {
+    const techProduct = await TechProduct.findById(req.params.techProductId);
+    if (!techProduct) {
       throw new Error();
-    } else if (camp.author.id.equals(req.user._id) || req.user.isAdmin) {
-      return next();
-    }
-    req.flash("error", "Only the camp creator has authorization to do that.");
-    return res.redirect(`/campgrounds/${req.params.campId}/comments`);
-  } catch (e) {
-    req.flash("error", "Sorry, no campground found.");
-    return res.redirect("/campgrounds");
-  }
-};
-
-middleware.hasCommentAuth = async (req, res, next) => {
-  try {
-    const comment = await Comment.findById(req.params.commentId);
-    if (!comment) {
-      throw new Error();
-    } else if (comment.author.id.equals(req.user._id) || req.user.isAdmin) {
+    } else if (techProduct.author.id.equals(req.user._id) || req.user.isAdmin) {
       return next();
     }
     req.flash(
       "error",
-      "Only the comment creator has authorization to do that."
+      "Only the Tech Product creator has authorization to do that."
     );
+    return res.redirect(`/techProducts/${req.params.techProductId}/reviews`);
+  } catch (e) {
+    req.flash("error", "Tech Product does not exist");
+    return res.redirect("/techProducts");
+  }
+};
+
+middleware.canModifyReview = async (req, res, next) => {
+  try {
+    const review = await Review.findById(req.params.reviewId);
+    if (!review) {
+      throw new Error();
+    } else if (review.author.id.equals(req.user._id) || req.user.isAdmin) {
+      return next();
+    }
+    req.flash("error", "Only the review creator has authorization to do that.");
     return res.redirect("back");
   } catch (e) {
-    req.flash("error", "Sorry, no comment found.");
+    req.flash("error", "Sorry, no review found.");
     return res.redirect("back");
   }
 };
 
-middleware.commentStatus = async (userId, campId) =>
-  await Comment.findOne({ campId, "author.id": userId });
+middleware.reviewStatus = async (userId, techProductId) =>
+  await Review.findOne({ techProductId, "author.id": userId });
 
-middleware.hasCommented = async function (req, res, next) {
-  const comment = await middleware.commentStatus(
+middleware.hasReviewed = async function (req, res, next) {
+  const review = await middleware.reviewStatus(
     req.user._id,
-    req.params.campId
+    req.params.techProductId
   );
-  if (!comment) {
+  if (!review) {
     return next();
   }
   req.flash(
     "error",
-    "Seems you have already commented. You can only edit or delete your comment."
+    "Seems you have already commented. You can only edit or delete your review."
   );
-  return res.redirect(`/campgrounds/${req.params.campId}/comments`);
+  return res.redirect(`/techProducts/${req.params.techProductId}/reviews`);
 };
 
-middleware.hasProfileAuth = async (req, res, next) => {
+middleware.canModifyProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.userId);
     if (!user) {
@@ -97,8 +97,8 @@ middleware.hasProfileAuth = async (req, res, next) => {
     );
     return res.redirect(`/users/${req.params.userId}`);
   } catch (e) {
-    req.flash("error", "Sorry, no user found.");
-    return res.redirect("/campgrounds");
+    req.flash("error", "User does not exist");
+    return res.redirect("/techProducts");
   }
 };
 
