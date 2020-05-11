@@ -1,7 +1,28 @@
 const $fileField = document.querySelector("input[type='file']");
-const $productCardsCards = document.querySelectorAll(".card");
+const $productCards = document.querySelectorAll(".card");
+const $revealPassBtns = document.querySelectorAll(".input-group-append > a");
 
-if ($fileField != null) {
+function showTypedPassword() {
+  $revealPassBtns.forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const $passwordField = this.parentNode.parentNode.querySelector(
+          ".input-group > input"
+        ),
+        $passwordIcon = this.querySelector("i");
+      if ($passwordField.getAttribute("type") === "text") {
+        $passwordField.setAttribute("type", "password");
+        $passwordIcon.classList.add("fa-eye-slash");
+        $passwordIcon.classList.remove("fa-eye");
+      } else {
+        $passwordIcon.classList.remove("fa-eye-slash");
+        $passwordIcon.classList.add("fa-eye");
+        $passwordField.setAttribute("type", "text");
+      }
+    });
+  });
+}
+
+function showFileName() {
   $fileField.onchange = function () {
     document.querySelector(
       "input[type='file'] + label"
@@ -9,10 +30,22 @@ if ($fileField != null) {
   };
 }
 
-if ($productCardsCards.length) {
-  $productCardsCards.forEach((card) => {
+function redirectOnCardClick() {
+  $productCards.forEach((card) => {
     card.addEventListener("click", function () {
       window.location.pathname = `/techProducts/${this.id}/reviews`;
     });
   });
+}
+
+if ($fileField != null) {
+  showFileName();
+}
+
+if ($productCards.length) {
+  redirectOnCardClick();
+}
+
+if ($revealPassBtns.length) {
+  showTypedPassword();
 }

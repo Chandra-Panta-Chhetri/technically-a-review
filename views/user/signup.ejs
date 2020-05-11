@@ -30,8 +30,13 @@
 						<label class="custom-file-label" for="avatar">Upload Profile Picture*</label>
 					</div>
 					<label for="code">Admin Code</label>
-					<input type="password" id="code" class="form-control mb-3" name="newUser[code]"
-						placeholder="Admin Code">
+					<div class="input-group mb-2">
+						<input type="password" id="password" class="form-control" name="newUser[code]"
+							placeholder="admin code">
+						<div class="input-group-append">
+							<a class="btn btn-secondary"><i class="fas fa-eye-slash"></i></a>
+						</div>
+					</div>
 					<button class="btn btn-primary btn-block mb-2">Sign Up!</button>
 					<span>Already have an account? <a href="/login">Login</a></span>
 				</div>
@@ -39,6 +44,4 @@
 		</form>
 	</div>
 </div>
-<script src="/js/agency.js"></script>
-<script src="/js/revealPassword.js"></script>
 <%- include("../partials/footer") %>
