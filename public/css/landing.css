@@ -42,22 +42,22 @@ h1 {
 }
 
 .slideshow li:nth-child(1) {
-  background-image: url(https://images.unsplash.com/photo-1553532646-968536ab10e7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1049&q=80);
+  background-image: url(https://res.cloudinary.com/nodeproject/image/upload/v1589223076/macbook_zxolfa.jpg);
 }
 .slideshow li:nth-child(2) {
-  background-image: url(https://images.unsplash.com/photo-1498049794561-7780e7231661?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80);
+  background-image: url(https://res.cloudinary.com/nodeproject/image/upload/v1589223074/watch_uebhcv.jpg);
   animation-delay: 10s;
 }
 .slideshow li:nth-child(3) {
-  background-image: url(https://images.unsplash.com/photo-1468495244123-6c6c332eeece?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=922&q=80);
+  background-image: url(https://res.cloudinary.com/nodeproject/image/upload/v1589223072/devices_gzl14y.jpg);
   animation-delay: 20s;
 }
 .slideshow li:nth-child(4) {
-  background-image: url(https://images.unsplash.com/photo-1544603396-e4a163c7c658?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1051&q=80);
+  background-image: url(https://res.cloudinary.com/nodeproject/image/upload/v1589223069/surface_pro_k5h40e.jpg);
   animation-delay: 30s;
 }
 .slideshow li:nth-child(5) {
-  background-image: url(https://images.unsplash.com/photo-1547932087-59a8f2be576e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80);
+  background-image: url(https://res.cloudinary.com/nodeproject/image/upload/v1589223067/headphones_tlmuot.jpg);
   animation-delay: 40s;
 }
 
