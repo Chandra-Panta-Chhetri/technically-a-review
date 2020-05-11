@@ -1,5 +1,5 @@
 const $fileField = document.querySelector("input[type='file']");
-const $productCards = document.querySelectorAll(".card");
+const $productCards = document.querySelectorAll(".techProduct-card-col .card");
 const $revealPassBtns = document.querySelectorAll(".input-group-append > a");
 
 function showTypedPassword() {

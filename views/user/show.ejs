@@ -1,31 +1,25 @@
 <%- include("../partials/header") %>
 <div class="row pt-5 text-center">
-	<div class="col-12 col-lg-5 order-2 order-lg-1 mt-3 mt-lg-0">
-		<% if(!usersTechProducts.length == 0) { %>
-		<h3>Created Tech Products:</h3>
-		<ul class="pl-0">
-			<% usersTechProducts.forEach(function(techProduct){ %>
-			<li>
-				<a href="/techProducts/<%= techProduct._id %>/reviews"><%= techProduct.name %></a> - Created
-				<%= moment(techProduct.createdAt).fromNow() %>
-			</li>
-			<% });%>
-		</ul>
-		<% } %>
-	</div>
-	<div class="col-12 col-lg-7 order-1 order-lg-2">
-		<h1><%= user.fullName %></h1>
-		<img src="<%= user.avatarUrl %>">
+	<div class="col-12 col-lg-4 order-2 order-lg-1 mt-3 mt-lg-0">
 		<% if(currentUser && currentUser._id.equals(user._id)) { %>
-		<div class="d-flex flex-column align-items-center">
-			<div>
-				<a href="/users/<%= user._id %>/edit" class="mt-2 btn btn-warning">Edit Profile</a>
-				<% if(currentUser.googleId === "-1"){ %>
-				<a href="/users/<%= user._id %>/changePassword" class="mt-2 btn btn-primary">Change Password</a>
-				<% }%>
+		<div class="card mb-3">
+			<div class="card-header">
+				Profile Management
 			</div>
-			<button class="btn btn-danger mt-2 mt-md-3" data-toggle="modal" data-target="#closeAccount">Close
-				Account</button>
+			<ul class="list-group list-group-flush">
+				<li class="list-group-item"> <a href="/users/<%= user._id %>/edit" class="mt-2 btn btn-warning"><i
+							class="fas fa-user-edit mr-2"></i>Edit Profile Info</a>
+				</li>
+				<% if(currentUser.googleId === "-1"){ %>
+				<li class="list-group-item"> <a href="/users/<%= user._id %>/changePassword"
+						class="mt-2 btn btn-primary"><i class="fas fa-user-lock mr-2"></i>Change Password</a>
+				</li>
+				<% }%>
+				<li class="list-group-item">
+					<button class="btn btn-danger mt-2 mt-md-3" data-toggle="modal" data-target="#closeAccount"><i
+							class="fas fa-user-times mr-2"></i>Delete Account</button>
+				</li>
+			</ul>
 		</div>
 		<div class="modal fade" id="closeAccount" tabindex="-1" role="dialog">
 			<div class="modal-dialog modal-dialog-centered" role="document">
@@ -35,10 +29,10 @@
 						<button class="close" data-dismiss="modal"></button>
 					</div>
 					<div class="modal-body">
-						Are you sure you want to close your account?
+						Are you sure you want to delete your account?
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
+						<button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 						<form action="/users/<%= user._id %>?_method=DELETE" method="POST">
 							<button type="submit" class="btn btn-danger">Yes, I'm sure</button>
 						</form>
@@ -47,6 +41,40 @@
 			</div>
 		</div>
 		<% } %>
+		<div class="card mb-2 mb-lg-0">
+			<div class="card-header">
+				<%= user.name %>'s Stats
+			</div>
+			<ul class="list-group list-group-flush">
+				<li class="list-group-item"><%= usersTechProducts.length %> Tech Products</li>
+				<li class="list-group-item"><%= numReviews %> Reviews</li>
+				<li class="list-group-item"><i class="far fa-calendar-alt mr-2"></i><strong>Joined:</strong>
+					<%= moment(user.createdAt).format("MMM DD, YYYY") %></li>
+				<% if(currentUser && currentUser._id.equals(user._id)) { %>
+				<li class="list-group-item"><i class="far fa-envelope mr-2"></i><strong>Email:</strong>
+					<%= user.email %></li>
+				<% } %>
+			</ul>
+		</div>
+	</div>
+	<div class="col-12 col-lg-4 order-3 order-lg-2">
+		<h3>Created Tech Products:</h3>
+		<ul class="pl-0">
+			<% usersTechProducts.forEach(function(techProduct){ %>
+			<li>
+				<a href="/techProducts/<%= techProduct._id %>/reviews"><%= techProduct.name %></a> -
+				<%= moment(techProduct.createdAt).format("MMM Do, YYYY") %>
+			</li>
+			<% });%>
+		</ul>
+	</div>
+	<div class="col-12 col-lg-4 order-1 order-lg-2">
+		<div class="card">
+			<img class="card-img-top" src="<%= user.avatarUrl %>" alt="users profile pic">
+			<div class="card-body">
+				<h5 class="card-title"><%= user.name %></h5>
+			</div>
+		</div>
 	</div>
 </div>
 

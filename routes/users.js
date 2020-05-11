@@ -1,5 +1,6 @@
 const TechProduct = require("../models/techProduct");
 const User = require("../models/user");
+const Review = require("../models/review");
 const router = require("express").Router();
 const middleware = require("../middleware");
 const cloudinary = require("./configs/cloudinaryConfig");
@@ -47,7 +48,10 @@ router.get("/:userId", async (req, res) => {
       throw new Error();
     }
     const usersTechProducts = await TechProduct.find({ "author.id": user._id });
-    return res.render("user/show", { user, usersTechProducts });
+    const numReviews = await Review.find({
+      "author.id": user._id
+    }).countDocuments();
+    return res.render("user/show", { user, usersTechProducts, numReviews });
   } catch (e) {
     req.flash("error", "User does not exist");
     return res.redirect("/techProducts");
