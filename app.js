@@ -1,17 +1,17 @@
 require("dotenv").config();
-const express = require("express"),
-  app = express(),
-  bodyParser = require("body-parser"),
-  mongoose = require("mongoose"),
-  passportSetup = require("./routes/configs/passportGoogleConfig"),
-  indexRoutes = require("./routes/index"),
-  reviewRoutes = require("./routes/reviews"),
-  techProductRoutes = require("./routes/techProducts"),
-  userRoutes = require("./routes/users"),
-  methodOverride = require("method-override"),
-  flash = require("connect-flash"),
-  cookieSession = require("cookie-session"),
-  passport = require("passport");
+require("./routes/configs/passportGoogleConfig");
+const express = require("express");
+const app = express();
+const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+const indexRoutes = require("./routes/index");
+const reviewRoutes = require("./routes/reviews");
+const techProductRoutes = require("./routes/techProducts");
+const userRoutes = require("./routes/users");
+const methodOverride = require("method-override");
+const flash = require("connect-flash");
+const cookieSession = require("cookie-session");
+const passport = require("passport");
 
 mongoose.connect(process.env.DBURL, {
   useNewUrlParser: true,
@@ -48,6 +48,9 @@ app.use("/", indexRoutes);
 app.use("/users", userRoutes);
 app.use("/techProducts", techProductRoutes);
 app.use("/techProducts/:techProductId/reviews", reviewRoutes);
+app.get("*", function (req, res) {
+  res.render("error404");
+});
 
 app.listen(process.env.PORT, process.env.IP, () => {
   console.log("Server Online...");
