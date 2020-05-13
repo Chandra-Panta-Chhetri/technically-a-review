@@ -2,16 +2,20 @@
 <div class="jumbotron mt-3 mb-3 text-center">
 	<h1 class="display-4">Welcome to TECHnically A Review!</h1>
 	<p class="lead">Enjoy our wide collection of tech product reviews</p>
-	<a class="btn btn-primary btn-lg" href="/techProducts/new" role="button">Add New Tech Product</a>
+	<a class="btn btn-primary btn-lg" href="/techProducts/new" role="button"><i class="fas fa-plus"></i>
+		Add New Tech Product</a>
 </div>
 <form action="/techProducts" method="GET">
 	<div class="row justify-content-center mt-4">
 		<div class="col-12 d-flex flex-column flex-md-row">
 			<input class="form-control" type="search" name="search" placeholder="search tech products by keyword(s)"
 				value="<%= searched && query.length > 0 ? query : '' %>">
-			<button class="btn btn-success ml-0 ml-md-2 mt-2 mt-md-0">Search</button>
+			<button class="btn btn-success ml-0 ml-md-2 mt-2 mt-md-0 search-btn"><i class="fas fa-search"></i>
+				Search</button>
 			<% if(searched && query.length > 0){ %>
-			<a href="/techProducts" class="btn btn-danger ml-0 ml-md-2 mt-2 mt-md-0 clear-search">Clear Search</a>
+			<a href="/techProducts" class="btn btn-danger ml-0 ml-md-2 mt-2 mt-md-0 clear-search"><i
+					class="fas fa-times"></i>
+				Clear Search</a>
 			<% } %>
 		</div>
 	</div>

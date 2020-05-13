@@ -1,7 +1,7 @@
 <%- include("../partials/header") %>
 <div class="row mt-3">
 	<div class="col-md-3 mb-3 mb-md-0">
-		<h4>More Info</h4>
+		<h4>Technical Info</h4>
 	</div>
 	<div class="col-md-9">
 		<div class="border rounded p-0">
@@ -16,9 +16,10 @@
 				<p>Submitted By <a href="/users/<%= techProduct.author.id %>"><%= techProduct.author.name %></a> on
 					<%= moment(techProduct.createdAt).format("MMM Do, YYYY") %></p>
 				<% if(currentUser && (techProduct.author.id.equals(currentUser._id) || currentUser.isAdmin)){ %>
-				<a class="btn btn-xs btn-warning" href="/techProducts/<%= techProduct._id %>/edit">Edit</a>
+				<a class="btn btn-xs btn-warning" href="/techProducts/<%= techProduct._id %>/edit"><i
+						class="far fa-edit"></i> Edit Post</a>
 				<form action="/techProducts/<%= techProduct._id %>/?_method=DELETE" method="POST">
-					<button class="btn btn-xs btn-danger">Delete</button>
+					<button class="btn btn-xs btn-danger"><i class="far fa-trash-alt"></i> Delete Post</button>
 				</form>
 				<% } %>
 			</div>
@@ -35,10 +36,11 @@
 			<div class="float-right mb-2 mt-2 mt-0-md">
 				<% if(reviewId !== -1){ %>
 				<a class="btn btn-xs btn-warning"
-					href="/techProducts/<%= techProduct._id %>/reviews/<%= reviewId %>/edit">Edit</a>
+					href="/techProducts/<%= techProduct._id %>/reviews/<%= reviewId %>/edit"><i class="far fa-edit"></i>
+					Edit Review</a>
 				<form action="/techProducts/<%= techProduct._id %>/reviews/<%= reviewId %>/?_method=DELETE"
 					method="POST">
-					<button class="btn btn-xs btn-danger">Delete</button>
+					<button class="btn btn-xs btn-danger"><i class="far fa-trash-alt"></i> Delete Review</button>
 				</form>
 				<% } else{ %>
 				<a class="btn btn-md btn-success float-right mb-2"

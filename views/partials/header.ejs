@@ -15,8 +15,7 @@
 		<div class="container text-center">
 			<a class="navbar-brand" href="/">TECHnically A Review</a>
 			<a class="nav-link d-none d-lg-block text-secondary <%= typeof pageName !== 'undefined' && pageName === 'techProducts' ? 'active-page' : '' %>"
-				href="/techProducts">
-				Home
+				href="/techProducts"><i class="fas fa-home"></i> Home
 			</a>
 			<button class="navbar-toggler" data-toggle="collapse" data-target="#navbarMenu">
 				<span class="navbar-toggler-icon"></span>
@@ -30,7 +29,7 @@
 					</li>
 					<li
 						class="nav-item <%= typeof pageName !== 'undefined' && pageName === 'signup' ? 'active-page' : '' %>">
-						<a class="nav-link" href="/signup">Sign Up</a>
+						<a class="nav-link" href="/signup">Sign Up <i class="fas fa-user-plus"></i></a>
 					</li>
 					<% } else { %>
 					<li class="nav-item d-flex justify-content-center justify-content-lg-end align-items-center">
@@ -38,7 +37,7 @@
 						<a class="nav-link" href="/users/<%= currentUser._id %>"><%= currentUser.name %></a>
 					</li>
 					<li class="nav-item">
-						<a class="nav-link" href="/logout">Logout</a>
+						<a class="nav-link" href="/logout">Logout <i class="fas fa-sign-out-alt"></i></a>
 					</li>
 					<% }%>
 				</ul>
