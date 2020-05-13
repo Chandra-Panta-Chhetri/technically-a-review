@@ -76,3 +76,8 @@ li.nav-item > img {
 .search-btn {
   white-space: nowrap;
 }
+
+.badge {
+  font-size: 18px;
+  padding-top: 2.5px;
+}

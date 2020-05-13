@@ -21,12 +21,23 @@
 	</div>
 </form>
 <% if (searched && query.length > 0) { %>
-<p class="mt-2 text-center text-md-right">
+<p class="mt-2 mb-0 text-center text-md-right">
 	<strong>
 		<%= numTechProducts %>
 		<%= numTechProducts > 1 || numTechProducts === 0 ? 'results' : 'result' %>
 	</strong>
 </p>
+
+<div class="text-center">
+	<% categoriesWithCount.forEach((category) => { %>
+	<a href="/techProducts?search=<%= query %>&category=<%= category._id.category %>"><%= category._id.category %>
+		(<%= category.categoryCount %>)</a>
+	<% }); %>
+	<% if(typeof categoryQuery !== "undefined"){ %>
+	<p><i class="fas fa-filter"></i> Category: <%= categoryQuery %></p>
+	<% } %>
+</div>
+<p></p>
 <% } else { %>
 <p class="text-center mt-2"><strong>Total Tech Products: <%= numTechProducts %></strong></p>
 <% } %>
@@ -52,18 +63,19 @@
 					<h6 class="sub-heading">No Reviews Yet</h6>
 					<% } %>
 				</div>
+				<div class="badge badge-pill badge-secondary"><%= techProduct.category %></div>
 			</div>
 		</div>
 	</div>
 	<% }); %>
 </div>
-<% var numPages = Math.ceil(numTechProducts / 6) %>
+<% var numPages = Math.ceil(numTechProducts / 1) %>
 <% if (numPages > 0) { %>
 <div class="row justify-content-center mt-3">
 	<ul class="pagination">
 		<% if (Number(currentPageNum) - 1 > 0) { %>
 		<li class="page-item"><a class="page-link"
-				href="/techProducts/?page=<%= Number(currentPageNum) - 1 %><%= searched ? '&search=' + query : '' %>"><i
+				href="/techProducts/?page=<%= Number(currentPageNum) - 1 %><%= searched ? '&search=' + query : '' %><%= typeof categoryQuery !== 'undefined' ? '&category=' + categoryQuery : '' %>"><i
 					class="fas fa-arrow-alt-circle-left"></i></a>
 		</li>
 		<% } %>
@@ -76,7 +88,8 @@
 		<li class="page-item active"><a class="page-link"><%= i %></a></li>
 		<% } else { %>
 		<li class="page-item"><a class="page-link"
-				href="/techProducts/?page=<%= i %><%= searched ? '&search=' + query : '' %>"><%= i %></a></li>
+				href="/techProducts/?page=<%= i %><%= searched ? '&search=' + query : '' %><%= typeof categoryQuery !== 'undefined' ? '&category=' + categoryQuery : '' %>"><%= i %></a>
+		</li>
 		<% } %>
 		<% if (i == Number(currentPageNum) + 4 && i < numPages) { %>
 		<li class="page-item"><a class="page-link">...</a></li>
@@ -84,7 +97,7 @@
 		<% } %>
 		<% if (Number(currentPageNum) + 1 <= numPages) { %>
 		<li class="page-item"><a class="page-link"
-				href="/techProducts/?page=<%= Number(currentPageNum) + 1 %><%= searched ? '&search=' + query : '' %>"><i
+				href="/techProducts/?page=<%= Number(currentPageNum) + 1 %><%= searched ? '&search=' + query : '' %><%= typeof categoryQuery !== 'undefined' ? '&category=' + categoryQuery : '' %>"><i
 					class="fas fa-arrow-alt-circle-right"></i>
 			</a>
 		</li>

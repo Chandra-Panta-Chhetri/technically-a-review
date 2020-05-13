@@ -28,7 +28,7 @@
     "pusher": "^3.0.1"
   },
   "devDependencies": {
-    "locus": "^2.0.4",
-    "dotenv": "^8.2.0"
+    "dotenv": "^8.2.0",
+    "locus": "^2.0.4"
   }
 }

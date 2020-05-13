@@ -9,24 +9,40 @@ const pusher = require("./configs/pusherConfig");
 
 router.get("/", async (req, res) => {
   var techProducts,
-    page = req.query.page || 1,
+    page = Number(req.query.page) || 1,
     skipNum;
-  const perPage = 6;
+  const perPage = 1;
+  const categoryQuery = req.query.category;
   try {
     if (req.query.search) {
-      const regex = new RegExp(helper.escapeRegex(req.query.search), "gi");
-      const numFilteredTechProducts = await TechProduct.find({
-        $or: [{ name: regex }]
-      }).countDocuments();
+      var categoriesWithCount = [];
+      const nameRegex = new RegExp(helper.escapeRegex(req.query.search), "gi");
+      const findSettings = { name: nameRegex };
+      if (typeof categoryQuery !== "undefined") {
+        findSettings.category = categoryQuery;
+      }
+      const numFilteredTechProducts = await TechProduct.find(
+        findSettings
+      ).countDocuments();
       if (
         numFilteredTechProducts &&
-        (Number(page) <= 0 ||
-          Number(page) > Math.ceil(numFilteredTechProducts / perPage))
+        (page <= 0 || page > Math.ceil(numFilteredTechProducts / perPage))
       ) {
         return res.redirect("/techProducts");
       }
       skipNum = perPage * page - perPage;
-      techProducts = await TechProduct.find({ $or: [{ name: regex }] })
+      if (typeof categoryQuery === "undefined") {
+        categoriesWithCount = await TechProduct.aggregate([
+          { $match: { name: nameRegex } },
+          {
+            $group: {
+              _id: { category: "$category" },
+              categoryCount: { $sum: 1 }
+            }
+          }
+        ]);
+      }
+      techProducts = await TechProduct.find(findSettings)
         .sort({ updatedAt: "desc" })
         .skip(skipNum)
         .limit(perPage)
@@ -38,13 +54,15 @@ router.get("/", async (req, res) => {
         searched: true,
         currentPageNum: page,
         numTechProducts: numFilteredTechProducts,
-        query: req.query.search
+        query: req.query.search,
+        categoriesWithCount,
+        categoryQuery
       });
     }
     const numTechProducts = await TechProduct.countDocuments();
     if (
       numTechProducts &&
-      (Number(page) <= 0 || Number(page) > Math.ceil(numTechProducts / perPage))
+      (page <= 0 || page > Math.ceil(numTechProducts / perPage))
     ) {
       return res.redirect("/techProducts");
     }
@@ -94,7 +112,7 @@ router.post(
     } catch (e) {
       req.flash(
         "error",
-        "Cannot create an techProduct at this time. Please try again later."
+        "Cannot create an tech Product at this time. Please try again later."
       );
     }
     return res.redirect("/techProducts");

@@ -7,7 +7,7 @@ const pusher = require("./configs/pusherConfig");
 
 router.get("/", async (req, res) => {
   try {
-    var page = req.query.page || 1;
+    var page = Number(req.query.page) || 1;
     const perPage = 4,
       techProduct = await TechProduct.findById(req.params.techProductId),
       numOfReviews = await Review.find({
@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
     }
     if (
       numOfReviews &&
-      (Number(page) <= 0 || Number(page) > Math.ceil(numOfReviews / perPage))
+      (page <= 0 || page > Math.ceil(numOfReviews / perPage))
     ) {
       return res.redirect(`/techProducts/${req.params.techProductId}/reviews`);
     }
