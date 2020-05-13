@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
   var techProducts,
     page = Number(req.query.page) || 1,
     skipNum;
-  const perPage = 1;
+  const perPage = 6;
   const categoryQuery = req.query.category;
   try {
     if (req.query.search) {
