@@ -81,3 +81,7 @@ li.nav-item > img {
   font-size: 18px;
   padding-top: 2.5px;
 }
+
+.card-img-top {
+  height: 35vh;
+}
