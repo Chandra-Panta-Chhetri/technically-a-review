@@ -49,7 +49,7 @@ app.use("/users", userRoutes);
 app.use("/techProducts", techProductRoutes);
 app.use("/techProducts/:techProductId/reviews", reviewRoutes);
 app.get("*", function (req, res) {
-  res.render("error404");
+  res.render("error404", { pageName: "404" });
 });
 
 app.listen(process.env.PORT, process.env.IP, () => {
