@@ -26,12 +26,14 @@ const techProductsSeed = [
 
 const usersSeed = [
   {
+    _id: new mongoose.Types.ObjectId(),
     email: "john@doe.com",
     name: "John Doe",
     avatarUrl:
       "https://res.cloudinary.com/nodeproject/image/upload/v1589223074/watch_uebhcv.jpg"
   },
   {
+    _id: new mongoose.Types.ObjectId(),
     email: "jimmy@chan.com",
     name: "Jimmy Denver",
     avatarUrl:
@@ -59,9 +61,7 @@ async function seedDB() {
   }
   await User.deleteMany({});
   for (let i = 0; i < techProductsSeed.length; i++) {
-    usersSeed[i]._id = new mongoose.Types.ObjectId();
     await User.register(usersSeed[i], "password");
-
     techProductsSeed[i]._id = new mongoose.Types.ObjectId();
     techProductsSeed[i].author = {
       id: usersSeed[i]._id,
@@ -73,6 +73,5 @@ async function seedDB() {
     await Review.create(reviewsSeed[i]);
   }
 }
-
 seedDB();
 console.log("Done Seeding DB");

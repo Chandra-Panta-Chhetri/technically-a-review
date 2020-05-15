@@ -8,50 +8,43 @@ const pusher = require("./configs/pusherConfig");
 router.get("/", async (req, res) => {
   try {
     var page = Number(req.query.page) || 1;
-    const perPage = 4,
-      techProduct = await TechProduct.findById(req.params.techProductId),
-      numOfReviews = await Review.find({
-        techProductId: techProduct._id
-      }).countDocuments();
+    var reviewId = -1;
+    const perPage = 1;
+    const techProduct = await TechProduct.findById(req.params.techProductId);
     if (!techProduct) {
       throw new Error();
     }
-    if (
-      numOfReviews &&
-      (page <= 0 || page > Math.ceil(numOfReviews / perPage))
-    ) {
-      return res.redirect(`/techProducts/${req.params.techProductId}/reviews`);
+    const allReviews = await Review.find({
+      techProductId: techProduct._id
+    });
+    if (!(await helper.isValidPageNumber(page, allReviews.length, perPage))) {
+      return res.redirect(`/techProducts/${techProduct._id}/reviews`);
     }
-    await techProduct
-      .populate({
-        path: "reviews",
-        options: {
-          skip: perPage * page - perPage,
-          limit: perPage,
-          sort: { updatedAt: "desc" }
-        }
-      })
-      .execPopulate();
+    techProduct.avgRating = helper.calculateAvgRating(allReviews);
+    await techProduct.save();
+    const paginatedReviews = await Review.find({
+      techProductId: techProduct._id
+    })
+      .sort({ updatedAt: "desc" })
+      .skip(perPage * page - perPage)
+      .limit(perPage)
+      .exec();
     if (req.user) {
-      const review = await middleware.reviewStatus(
+      const loggedInUsersReview = await middleware.getReviewByUserIdAndTechId(
         req.user._id,
         req.params.techProductId
       );
-      return res.render("techProduct/show", {
-        techProduct,
-        numOfReviews,
-        reviewId: review === null ? -1 : review._id,
-        currentPageNum: page
-      });
+      reviewId = loggedInUsersReview === null ? -1 : loggedInUsersReview._id;
     }
     return res.render("techProduct/show", {
       techProduct,
-      numOfReviews,
-      reviewId: -1,
+      reviews: paginatedReviews,
+      totalReviews: allReviews.length,
+      reviewId,
       currentPageNum: page
     });
   } catch (e) {
-    req.flash("error", "Sorry, no techProduct found.");
+    req.flash("error", "Tech product does not exist.");
     return res.redirect("/techProducts");
   }
 });
@@ -68,7 +61,7 @@ router.get(
       }
       return res.render("review/new", { techProduct });
     } catch (e) {
-      req.flash("error", "Tech product not found");
+      req.flash("error", "Tech product does not exist.");
       return res.redirect("/techProducts");
     }
   }
@@ -87,19 +80,14 @@ router.post(
       req.body.review.techProductId = techProduct._id;
       req.body.review.author = { id: req.user._id, name: req.user.name };
       await Review.create(req.body.review);
-      const techProductReviews = await Review.find({
-        techProductId: techProduct._id
-      });
-      techProduct.avgRating = helper.calculateAvgRating(techProductReviews);
-      await techProduct.save();
       req.flash("success", "Review successfully created!");
       pusher.trigger("notifications", "changed_post_or_comment", {
-        message: `${req.user.name} has just left a new review in ${techProduct.name}. Come check it out!`,
+        message: `${req.user.name} has just posted a new review in ${techProduct.name}. Come check it out!`,
         url: `/techProducts/${techProduct._id}/reviews`
       });
-      return res.redirect(`/techProducts/${req.params.techProductId}/reviews`);
+      return res.redirect(`/techProducts/${techProduct._id}/reviews`);
     } catch (e) {
-      req.flash("error", "Tech product not found");
+      req.flash("error", "Tech product does not exist.");
       return res.redirect("/techProducts");
     }
   }
@@ -125,22 +113,18 @@ router.put(
   async (req, res) => {
     try {
       await Review.findByIdAndUpdate(req.params.reviewId, req.body.review);
-      const techProduct = await TechProduct.findById(req.params.techProductId),
-        techProductReviews = await Review.find({
-          techProductId: techProduct._id
-        });
-      if (!techProductReviews.length || !techProduct) {
+      const techProduct = await TechProduct.findById(req.params.techProductId);
+      if (!techProduct) {
         throw new Error();
       }
-      techProduct.avgRating = helper.calculateAvgRating(techProductReviews);
-      await techProduct.save();
       req.flash("success", "Review successfully updated!");
-      return res.redirect(`/techProducts/${req.params.techProductId}/reviews`);
+      pusher.trigger("notifications", "changed_post_or_comment", {
+        message: `${req.user.name} has updated their review for ${techProduct.name}. Come check it out!`,
+        url: `/techProducts/${techProduct._id}/reviews`
+      });
+      return res.redirect(`/techProducts/${techProduct._id}/reviews`);
     } catch (e) {
-      req.flash(
-        "error",
-        "Cannot update review at this time. Please try again later."
-      );
+      req.flash("error", "Review update unsuccessful. Please try again later.");
       return res.redirect("/techProducts");
     }
   }
@@ -153,21 +137,19 @@ router.delete(
   async (req, res) => {
     try {
       await Review.findByIdAndRemove(req.params.reviewId);
-      const techProduct = await TechProduct.findById(req.params.techProductId),
-        techProductReviews = await Review.find({
-          techProductId: techProduct._id
-        });
+      const techProduct = await TechProduct.findById(req.params.techProductId);
       if (!techProduct) {
         throw new Error();
       }
-      techProduct.avgRating = helper.calculateAvgRating(techProductReviews);
-      await techProduct.save();
-      req.flash("success", "Review was successfully deleted!");
+      req.flash("success", "Review successfully deleted!");
       pusher.trigger("notifications", "changed_post_or_comment", {
         message: `${req.user.name} has removed their review for ${techProduct.name}.`
       });
     } catch (e) {
-      req.flash("error", "Cannot delete review. Please try again later.");
+      req.flash(
+        "error",
+        "Review deletion unsuccessful. Please try again later."
+      );
     }
     return res.redirect(`/techProducts/${req.params.techProductId}/reviews`);
   }

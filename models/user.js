@@ -10,16 +10,16 @@ const userSchema = new mongoose.Schema(
     name: { type: String, required: true },
     avatarUrl: {
       type: String,
-      required: true,
       validate(value) {
+        //ensures all pictures were uploaded to cloudinary
         if (!value.toLowerCase().includes("cloudinary")) {
-          throw new Error("Invalid avatar url");
+          throw new Error("Invalid avatar url.");
         }
       }
     },
+    isAdmin: { type: Boolean, default: false },
     resetPasswordToken: String,
-    resetPasswordExpires: Date,
-    isAdmin: { type: Boolean, default: false }
+    resetPasswordExpires: Date
   },
   { timestamps: true }
 );
@@ -32,6 +32,8 @@ userSchema.plugin(passportLocalMongoose, {
 userSchema.pre("remove", async function (next) {
   await Review.deleteMany({ "author.id": this._id });
   const techProducts = await TechProduct.find({ "author.id": this._id });
+  //using loop triggers techProduct middleware that ensures picture stored in cloudinary is
+  //removed before techProduct removed
   for (let techProduct of techProducts) {
     await techProduct.remove();
   }

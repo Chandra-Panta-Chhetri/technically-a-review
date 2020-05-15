@@ -9,7 +9,7 @@ const techProductSchema = new mongoose.Schema(
       required: true,
       validate(value) {
         if (!value.toLowerCase().includes("cloudinary")) {
-          throw new Error("Invalid image url!");
+          throw new Error("Invalid image url.");
         }
       }
     },

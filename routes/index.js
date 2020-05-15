@@ -6,13 +6,13 @@ const nodemailer = require("nodemailer");
 const middleware = require("../middleware");
 const crypto = require("crypto");
 
-router.get("/login", middleware.hasLoggedIn, (req, res) =>
+router.get("/login", middleware.isLoggedOut, (req, res) =>
   res.render("user/login", { pageName: "login" })
 );
 
 router.post(
   "/login",
-  middleware.hasLoggedIn,
+  middleware.isLoggedOut,
   middleware.lowercaseEmail,
   passport.authenticate("local", {
     failureRedirect: "/login",
@@ -24,74 +24,96 @@ router.post(
   }
 );
 
-router.get("/signup", middleware.hasLoggedIn, (req, res) =>
+router.get(
+  "/auth/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+router.get(
+  process.env.GOOGLE_CALLBACK_URL,
+  passport.authenticate("google", {
+    failureRedirect: "/login",
+    failureMessage: "Login unsuccessful. Please try again."
+  }),
+  (req, res) => {
+    req.flash("success", `Welcome ${req.user.name}!`);
+    res.redirect("/techProducts");
+  }
+);
+
+router.get("/signup", middleware.isLoggedOut, (req, res) =>
   res.render("user/signup", { pageName: "signup" })
 );
 
 router.get("/logout", middleware.isLoggedIn, (req, res) => {
   req.logout();
-  req.flash("success", "Logged out successfully!");
+  req.flash("success", "Logged out successfully. See you next time!");
   res.redirect("/techProducts");
 });
 
-router.get("/forgot", middleware.hasLoggedIn, (req, res) =>
+router.get("/forgot", middleware.isLoggedOut, (req, res) =>
   res.render("user/forgot")
 );
 
-router.post("/forgot", middleware.hasLoggedIn, (req, res) => {
-  Async.waterfall(
-    [
-      (done) => {
-        crypto.randomBytes(20, (err, buf) => {
-          var token = buf.toString("hex");
-          done(err, token);
-        });
-      },
-      (token, done) => {
-        User.findOne({ email: req.body.email.toLowerCase() }, (err, user) => {
-          if (err || !user || user.googleId !== "-1") {
+router.post(
+  "/forgot",
+  middleware.isLoggedOut,
+  middleware.lowercaseEmail,
+  (req, res) => {
+    Async.waterfall(
+      [
+        (done) => {
+          crypto.randomBytes(20, (err, buf) => {
+            var token = buf.toString("hex");
+            done(err, token);
+          });
+        },
+        (token, done) => {
+          User.findOne({ email: req.body.email }, (err, user) => {
+            if (err || !user || user.googleId !== "-1") {
+              req.flash(
+                "success",
+                `To reset your password, please follow the instructions sent to ${req.body.email}`
+              );
+              return res.redirect("/forgot");
+            }
+            user.resetPasswordToken = token;
+            user.resetPasswordExpires = Date.now() + 900000; //15 mins
+            user.save((err) => {
+              done(err, token, user);
+            });
+          });
+        },
+        (token, user, done) => {
+          var smtpTransport = nodemailer.createTransport({
+            service: "Gmail",
+            auth: {
+              user: process.env.GMAIL_EMAIL,
+              pass: process.env.GMAIL_PW
+            }
+          });
+          var mailContent = `Please click on the link below to reset your password for TECHnically A Review:\nhttp://${req.headers.host}/reset/${token}\nNote: This link will expire in 15 mins.`;
+          var mailOptions = {
+            to: user.email,
+            from: process.env.GMAIL_EMAIL,
+            subject: "TECHnically A Review Password Reset",
+            text: mailContent
+          };
+          smtpTransport.sendMail(mailOptions, (err) => {
             req.flash(
               "success",
-              `To reset your password, please follow the instructions sent to ${req.body.email.toLowerCase()}`
+              `To reset your password, please follow the instructions sent to ${req.body.email}`
             );
-            return res.redirect("/forgot");
-          }
-          user.resetPasswordToken = token;
-          user.resetPasswordExpires = Date.now() + 900000; //15 mins
-          user.save((err) => {
-            done(err, token, user);
+            done(err, "done");
           });
-        });
-      },
-      (token, user, done) => {
-        var smtpTransport = nodemailer.createTransport({
-          service: "Gmail",
-          auth: {
-            user: process.env.GMAIL_EMAIL,
-            pass: process.env.GMAIL_PW
-          }
-        });
-        var mailContent = `You or someone requested a password change for the user with username: ${user.email}.\nPlease click on the link below to reset your password:\nhttp://${req.headers.host}/reset/${token}\nNote: This link will expire in 15 mins.`;
-        var mailOptions = {
-          to: user.email,
-          from: process.env.GMAIL_EMAIL,
-          subject: "TECHnically A Review Password Reset",
-          text: mailContent
-        };
-        smtpTransport.sendMail(mailOptions, (err) => {
-          req.flash(
-            "success",
-            `To reset your password, please follow the instructions sent to ${req.body.email}`
-          );
-          done(err, "done");
-        });
-      }
-    ],
-    (err) => res.redirect("/forgot")
-  );
-});
+        }
+      ],
+      (err) => res.redirect("/forgot")
+    );
+  }
+);
 
-router.get("/reset/:token", middleware.hasLoggedIn, async (req, res) => {
+router.get("/reset/:token", middleware.isLoggedOut, async (req, res) => {
   try {
     const user = await User.findOne({
       resetPasswordToken: req.params.token,
@@ -107,7 +129,7 @@ router.get("/reset/:token", middleware.hasLoggedIn, async (req, res) => {
   }
 });
 
-router.post("/reset/:token", middleware.hasLoggedIn, (req, res) => {
+router.post("/reset/:token", middleware.isLoggedOut, (req, res) => {
   Async.waterfall(
     [
       (done) => {
@@ -135,7 +157,7 @@ router.post("/reset/:token", middleware.hasLoggedIn, (req, res) => {
                 });
               });
             } else {
-              req.flash("error", "Passwords must match");
+              req.flash("error", "Passwords must match.");
               res.redirect(`/reset/${req.params.token}`);
             }
           }
@@ -157,7 +179,7 @@ router.post("/reset/:token", middleware.hasLoggedIn, (req, res) => {
             "This is a confirmation email to inform you that your password has been successfully changed!"
         };
         smtpTransport.sendMail(mailOptions, function (err) {
-          req.flash("success", "Password changed successfully!");
+          req.flash("success", "Password change successful!");
           done(err);
         });
       }
@@ -165,22 +187,5 @@ router.post("/reset/:token", middleware.hasLoggedIn, (req, res) => {
     (err) => res.redirect("/techProducts")
   );
 });
-
-router.get(
-  "/auth/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
-
-router.get(
-  "/auth/google/redirect",
-  passport.authenticate("google", {
-    failureRedirect: "/login",
-    failureMessage: "Login unsuccessful, please try again"
-  }),
-  (req, res) => {
-    req.flash("success", `Welcome ${req.user.name}!`);
-    res.redirect("/techProducts");
-  }
-);
 
 module.exports = router;

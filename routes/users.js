@@ -9,23 +9,22 @@ const mongoose = require("mongoose");
 
 router.post(
   "/",
-  middleware.hasLoggedIn,
+  middleware.isLoggedOut,
   upload.single("avatar"),
   async (req, res) => {
     try {
-      const userId = new mongoose.Types.ObjectId();
-      const userPassword = req.body.newUser.password;
+      const password = req.body.newUser.password;
       req.body.newUser.isAdmin =
         req.body.newUser.code === process.env.ADMINCODE;
       delete req.body.newUser.code;
       delete req.body.newUser.password;
-      req.body.newUser._id = userId;
+      const user = await User.register(req.body.newUser, password);
       const result = await cloudinary.uploader.upload(req.file.path, {
-        public_id: userId,
+        public_id: user._id,
         eager: [{ width: 350, height: 250, crop: "scale", quality: "100" }]
       });
-      req.body.newUser.avatarUrl = result.eager[0].secure_url;
-      const user = await User.register(req.body.newUser, userPassword);
+      user.avatarUrl = result.eager[0].secure_url;
+      await user.save();
       req.login(user, () => {
         req.flash("success", `Welcome ${user.name}!`);
         return res.redirect("/techProducts");
@@ -53,7 +52,7 @@ router.get("/:userId", async (req, res) => {
     }).countDocuments();
     return res.render("user/show", { user, usersTechProducts, numReviews });
   } catch (e) {
-    req.flash("error", "User does not exist");
+    req.flash("error", "User does not exist.");
     return res.redirect("/techProducts");
   }
 });
@@ -90,7 +89,7 @@ router.put(
     } catch (e) {
       req.flash(
         "error",
-        "Cannot update user info at this time. Please try again later."
+        "Profile update unsuccessful. Please try again later."
       );
     }
     return res.redirect(`/users/${req.params.userId}`);
@@ -115,7 +114,7 @@ router.delete(
     } catch (e) {
       req.flash(
         "error",
-        "Cannot delete account at this time. Please try again later."
+        "Account deletion unsuccessful. Please try again later."
       );
       return res.redirect(`/users/${req.params.userId}`);
     }
@@ -144,18 +143,21 @@ router.post(
           req.body.newPass,
           (err) => {
             if (err) {
-              req.flash("error", "Current password entered was wrong.");
+              req.flash("error", "Current password is wrong.");
               return res.redirect(`/users/${req.params.userId}/changePassword`);
             }
-            req.flash("success", "Password has been succesfully changed.");
+            req.flash("success", "Password has been successfully changed!");
             return res.redirect(`/users/${req.params.userId}`);
           }
         );
       }
-      req.flash("error", "Please make sure passwords match");
+      req.flash("error", "Please make sure passwords match.");
       return res.redirect(`/users/${req.params.userId}/changePassword`);
     } catch (e) {
-      req.flash("error", "User does not exist");
+      req.flash(
+        "error",
+        "Password change unsuccessful. Please try again later."
+      );
       return res.redirect("/techProducts");
     }
   }

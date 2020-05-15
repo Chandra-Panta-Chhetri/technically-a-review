@@ -32,9 +32,9 @@
 						<a class="nav-link" href="/signup">Sign Up <i class="fas fa-user-plus"></i></a>
 					</li>
 					<% } else { %>
-					<li class="nav-item d-flex justify-content-center justify-content-lg-end align-items-center">
-						<img class="mr-1 mr-lg-0" src="<%= currentUser.avatarUrl %>">
-						<a class="nav-link" href="/users/<%= currentUser._id %>"><%= currentUser.name %></a>
+					<li class="nav-item">
+						<a class="nav-link" href="/users/<%= currentUser._id %>"><i class="fas fa-user"></i>
+							<%= currentUser.name %></a>
 					</li>
 					<li class="nav-item">
 						<a class="nav-link" href="/logout">Logout <i class="fas fa-sign-out-alt"></i></a>

@@ -5,5 +5,3 @@ const passport = require("passport");
 passport.use(
   new localStrategy({ usernameField: "email" }, User.authenticate())
 );
-
-module.exports = passport;

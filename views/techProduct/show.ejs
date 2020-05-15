@@ -30,7 +30,7 @@
 			<i class="far fa-star"></i>
 			<% } %>
 			<% } %>
-			<span>(Total Reviews: <%= numOfReviews %>)</span>
+			<span>(Total Reviews: <%= totalReviews %>)</span>
 			<div class="float-right mb-2 mt-2 mt-0-md">
 				<% if(reviewId !== -1){ %>
 				<a class="btn btn-xs btn-warning"
@@ -47,7 +47,7 @@
 				<% }%>
 			</div>
 			<hr>
-			<% techProduct.reviews.forEach(function(review){ %>
+			<% reviews.forEach(function(review){ %>
 			<p>
 				<% for(var i = 1; i <= 5; i++){ %>
 				<% if(i <= review.rating){ %>
@@ -56,23 +56,24 @@
 				<i class="far fa-star"></i>
 				<% } %>
 				<% } %>
-				<span class="float-right ml-2 ml-sm-0">Posted: <%= moment(review.createdAt).fromNow() %></span>
+				<span class="float-right ml-2 ml-sm-0"><%= moment(review.createdAt).fromNow() %></span>
 				<br>
-				<strong><a href="/users/<%= techProduct.author.id %>"><%= review.author.name %></a></strong>
+				<strong><a href="/users/<%= review.author.id %>"><%= review.author.name %></a></strong>
 			</p>
 			<p><%= review.comment %></p>
 			<% if(currentUser && currentUser.isAdmin) { %>
 			<div class="mb-2">
 				<a class="btn btn-xs btn-warning"
-					href="/techProducts/<%= techProduct._id %>/reviews/<%= review._id %>/edit">Edit</a>
+					href="/techProducts/<%= techProduct._id %>/reviews/<%= review._id %>/edit"><i
+						class="far fa-edit"></i> Edit Review</a>
 				<form action="/techProducts/<%= techProduct._id %>/reviews/<%= review._id %>/?_method=DELETE"
 					method="POST">
-					<button class="btn btn-xs btn-danger">Delete</button>
+					<button class="btn btn-xs btn-danger"><i class="far fa-trash-alt"></i> Delete Review</button>
 				</form>
 			</div>
 			<% } %>
 			<% }); %>
-			<% var numPages = Math.ceil(numOfReviews / 4) %>
+			<% var numPages = Math.ceil(totalReviews / 1) %>
 			<% if (numPages > 0) { %>
 			<section class="row justify-content-center mt-3">
 				<ul class="pagination">

@@ -11,11 +11,11 @@ middleware.isLoggedIn = (req, res, next) => {
   res.redirect("/login");
 };
 
-middleware.hasLoggedIn = (req, res, next) => {
+middleware.isLoggedOut = (req, res, next) => {
   if (!req.isAuthenticated()) {
     return next();
   }
-  req.flash("error", "Please logout before you do that.");
+  req.flash("error", "Please logout before doing that.");
   res.redirect("/techProducts");
 };
 
@@ -23,10 +23,7 @@ middleware.hasGoogleAccount = (req, res, next) => {
   if (req.user.googleId === "-1") {
     return next();
   }
-  req.flash(
-    "error",
-    "You cannot change your password as you've signed in through Google."
-  );
+  req.flash("error", "You cannot do that as you've signed in through Google.");
   res.redirect(`/users/${req.params.userId}`);
 };
 
@@ -38,13 +35,10 @@ middleware.canModifyTechProduct = async (req, res, next) => {
     } else if (techProduct.author.id.equals(req.user._id) || req.user.isAdmin) {
       return next();
     }
-    req.flash(
-      "error",
-      "Only the Tech Product creator has authorization to do that."
-    );
+    req.flash("error", "Only the author has authorization to do that.");
     return res.redirect(`/techProducts/${req.params.techProductId}/reviews`);
   } catch (e) {
-    req.flash("error", "Tech Product does not exist");
+    req.flash("error", "Tech product does not exist.");
     return res.redirect("/techProducts");
   }
 };
@@ -57,30 +51,12 @@ middleware.canModifyReview = async (req, res, next) => {
     } else if (review.author.id.equals(req.user._id) || req.user.isAdmin) {
       return next();
     }
-    req.flash("error", "Only the review creator has authorization to do that.");
-    return res.redirect("back");
+    req.flash("error", "Only the review author has authorization to do that.");
+    return res.redirect(`/techProducts/${req.params.techProductId}/reviews`);
   } catch (e) {
-    req.flash("error", "Sorry, no review found.");
+    req.flash("error", "Review does not exist.");
     return res.redirect("back");
   }
-};
-
-middleware.reviewStatus = async (userId, techProductId) =>
-  await Review.findOne({ techProductId, "author.id": userId });
-
-middleware.hasReviewed = async function (req, res, next) {
-  const review = await middleware.reviewStatus(
-    req.user._id,
-    req.params.techProductId
-  );
-  if (!review) {
-    return next();
-  }
-  req.flash(
-    "error",
-    "Seems you have already commented. You can only edit or delete your review."
-  );
-  return res.redirect(`/techProducts/${req.params.techProductId}/reviews`);
 };
 
 middleware.canModifyProfile = async (req, res, next) => {
@@ -93,11 +69,34 @@ middleware.canModifyProfile = async (req, res, next) => {
     }
     req.flash(
       "error",
-      "Only the account holder may make profile modifications."
+      "Only the account owner can make profile modifications."
     );
     return res.redirect(`/users/${req.params.userId}`);
   } catch (e) {
-    req.flash("error", "User does not exist");
+    req.flash("error", "User does not exist.");
+    return res.redirect("/techProducts");
+  }
+};
+
+middleware.getReviewByUserIdAndTechId = async (userId, techProductId) =>
+  await Review.findOne({ techProductId, "author.id": userId });
+
+middleware.hasReviewed = async function (req, res, next) {
+  try {
+    const review = await middleware.getReviewByUserIdAndTechId(
+      req.user._id,
+      req.params.techProductId
+    );
+    if (!review) {
+      return next();
+    }
+    req.flash(
+      "error",
+      "You have already posted a review. You can only edit or delete your review."
+    );
+    return res.redirect(`/techProducts/${req.params.techProductId}/reviews`);
+  } catch (e) {
+    req.flash("error", "Tech product does not exist.");
     return res.redirect("/techProducts");
   }
 };
