@@ -8,7 +8,7 @@ const helper = require("./helpers/helper");
 const pusher = require("./configs/pusherConfig");
 
 router.get("/", async (req, res) => {
-  const perPage = 1;
+  const perPage = 6;
   const filter = {};
   const categoryQuery = req.query.category || "";
   const searchQuery = req.query.search || "";

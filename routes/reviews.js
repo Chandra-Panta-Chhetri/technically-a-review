@@ -9,7 +9,7 @@ router.get("/", async (req, res) => {
   try {
     var page = Number(req.query.page) || 1;
     var reviewId = -1;
-    const perPage = 1;
+    const perPage = 4;
     const techProduct = await TechProduct.findById(req.params.techProductId);
     if (!techProduct) {
       throw new Error();

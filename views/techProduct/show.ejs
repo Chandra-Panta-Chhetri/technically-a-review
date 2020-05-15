@@ -14,10 +14,11 @@
 				<p>Submitted By <a href="/users/<%= techProduct.author.id %>"><%= techProduct.author.name %></a> on
 					<%= moment(techProduct.createdAt).format("MMM Do, YYYY") %></p>
 				<% if(currentUser && (techProduct.author.id.equals(currentUser._id) || currentUser.isAdmin)){ %>
-				<a class="btn btn-xs btn-warning" href="/techProducts/<%= techProduct._id %>/edit"><i
+				<a class="btn btn-xs btn-warning mt-1 mt-sm-0" href="/techProducts/<%= techProduct._id %>/edit"><i
 						class="far fa-edit"></i> Edit Post</a>
 				<form action="/techProducts/<%= techProduct._id %>/?_method=DELETE" method="POST">
-					<button class="btn btn-xs btn-danger"><i class="far fa-trash-alt"></i> Delete Post</button>
+					<button class="btn btn-xs btn-danger mt-1 mt-sm-0"><i class="far fa-trash-alt"></i> Delete
+						Post</button>
 				</form>
 				<% } %>
 			</div>
@@ -31,14 +32,15 @@
 			<% } %>
 			<% } %>
 			<span>(Total Reviews: <%= totalReviews %>)</span>
-			<div class="float-right mb-2 mt-2 mt-0-md">
+			<div class="float-right mb-2 mt-2 mt-md-2">
 				<% if(reviewId !== -1){ %>
-				<a class="btn btn-xs btn-warning"
+				<a class="btn btn-xs btn-warning mt-1 mt-sm-0"
 					href="/techProducts/<%= techProduct._id %>/reviews/<%= reviewId %>/edit"><i class="far fa-edit"></i>
 					Edit Review</a>
 				<form action="/techProducts/<%= techProduct._id %>/reviews/<%= reviewId %>/?_method=DELETE"
 					method="POST">
-					<button class="btn btn-xs btn-danger"><i class="far fa-trash-alt"></i> Delete Review</button>
+					<button class="btn btn-xs btn-danger mt-1 mt-sm-0"><i class="far fa-trash-alt"></i> Delete
+						Review</button>
 				</form>
 				<% } else{ %>
 				<a class="btn btn-md btn-success float-right mb-2"
@@ -73,7 +75,7 @@
 			</div>
 			<% } %>
 			<% }); %>
-			<% var numPages = Math.ceil(totalReviews / 1) %>
+			<% var numPages = Math.ceil(totalReviews / 4) %>
 			<% if (numPages > 0) { %>
 			<section class="row justify-content-center mt-3">
 				<ul class="pagination">
