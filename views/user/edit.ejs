@@ -1,0 +1,24 @@
+<%- include("../partials/header") %>
+<div class="my-3">
+	<h1 class="text-center">Edit Profile</h1>
+	<div class="my-4">
+		<form action="/users/<%= user._id %>?_method=PUT" method="POST" enctype="multipart/form-data"
+			autocomplete="off">
+			<div class="form-group row justify-content-center">
+				<div class="col-12 col-md-6 col-lg-5">
+					<label for="email">Email*</label>
+					<input type="email" id="email" class="form-control mb-4" name="user[email]"
+						value="<%= user.email %>" required
+						pattern="^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,3})$">
+					<div class="custom-file mb-3">
+						<input type="file" id="avatar" class="custom-file-input" name="avatar" accept="image/*">
+						<label class="custom-file-label" for="avatar">Upload New Profile Picture</label>
+					</div>
+					<button class="btn btn-primary btn-block mb-2">Confirm Changes</button>
+					<a href="/users/<%= user._id %>">Back to Profile</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<%- include("../partials/footer") %>

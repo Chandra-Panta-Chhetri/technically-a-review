@@ -1,0 +1,115 @@
+<%- include("../partials/header") %>
+<div class="row mt-3 justify-content-center">
+	<div class="col-md-9">
+		<div class="border rounded p-0">
+			<img src="<%= techProduct.imageUrl %>">
+			<div class="mt-2 p-2">
+				<h5 class="text-primary"><%= techProduct.name %>
+					<div class="badge badge-pill badge-secondary"><%= techProduct.category %></div>
+					<strong>
+						<span class="float-right text-dark mt-4 mt-sm-0">$<%= techProduct.price %></span>
+					</strong>
+				</h5>
+				<p class="mt-4 mt-sm-3"><%= techProduct.description %></p>
+				<p>Submitted By <a href="/users/<%= techProduct.author.id %>"><%= techProduct.author.name %></a> on
+					<%= moment(techProduct.createdAt).format("MMM Do, YYYY") %></p>
+				<% if(currentUser && (techProduct.author.id.equals(currentUser._id) || currentUser.isAdmin)){ %>
+				<a class="btn btn-xs btn-warning mt-1 mt-sm-0" href="/techProducts/<%= techProduct._id %>/edit"><i
+						class="far fa-edit"></i> Edit Post</a>
+				<form action="/techProducts/<%= techProduct._id %>/?_method=DELETE" method="POST">
+					<button class="btn btn-xs btn-danger mt-1 mt-sm-0"><i class="far fa-trash-alt"></i> Delete
+						Post</button>
+				</form>
+				<% } %>
+			</div>
+		</div>
+		<div class="my-3 p-3 rounded border bg-light">
+			<% for(var i = 1; i <= 5; i++){ %>
+			<% if(i <= techProduct.avgRating){ %>
+			<i class="fas fa-star text-warning"></i>
+			<% }else{ %>
+			<i class="far fa-star"></i>
+			<% } %>
+			<% } %>
+			<span>(Total Reviews: <%= totalReviews %>)</span>
+			<div class="float-right mb-2 mt-2 mt-md-2">
+				<% if(reviewId !== -1){ %>
+				<a class="btn btn-xs btn-warning mt-1 mt-sm-0"
+					href="/techProducts/<%= techProduct._id %>/reviews/<%= reviewId %>/edit"><i class="far fa-edit"></i>
+					Edit Review</a>
+				<form action="/techProducts/<%= techProduct._id %>/reviews/<%= reviewId %>/?_method=DELETE"
+					method="POST">
+					<button class="btn btn-xs btn-danger mt-1 mt-sm-0"><i class="far fa-trash-alt"></i> Delete
+						Review</button>
+				</form>
+				<% } else{ %>
+				<a class="btn btn-md btn-success float-right mb-2"
+					href="/techProducts/<%= techProduct._id %>/reviews/new">Leave a
+					Review</a>
+				<% }%>
+			</div>
+			<hr>
+			<% reviews.forEach(function(review){ %>
+			<p>
+				<% for(var i = 1; i <= 5; i++){ %>
+				<% if(i <= review.rating){ %>
+				<i class="fas fa-star text-warning"></i>
+				<% }else{ %>
+				<i class="far fa-star"></i>
+				<% } %>
+				<% } %>
+				<span class="float-right ml-2 ml-sm-0"><%= moment(review.createdAt).fromNow() %></span>
+				<br>
+				<strong><a href="/users/<%= review.author.id %>"><%= review.author.name %></a></strong>
+			</p>
+			<p><%= review.comment %></p>
+			<% if(currentUser && currentUser.isAdmin) { %>
+			<div class="mb-2">
+				<a class="btn btn-xs btn-warning"
+					href="/techProducts/<%= techProduct._id %>/reviews/<%= review._id %>/edit"><i
+						class="far fa-edit"></i> Edit Review</a>
+				<form action="/techProducts/<%= techProduct._id %>/reviews/<%= review._id %>/?_method=DELETE"
+					method="POST">
+					<button class="btn btn-xs btn-danger"><i class="far fa-trash-alt"></i> Delete Review</button>
+				</form>
+			</div>
+			<% } %>
+			<% }); %>
+			<% var numPages = Math.ceil(totalReviews / 4) %>
+			<% if (numPages > 0) { %>
+			<section class="row justify-content-center mt-3">
+				<ul class="pagination">
+					<% if (Number(currentPageNum) - 1 > 0) { %>
+					<li class="page-item"><a class="page-link"
+							href="/techProducts/<%= techProduct._id %>/reviews/?page=<%= Number(currentPageNum) - 1 %>"><i
+								class="fas fa-arrow-alt-circle-left"></i></a>
+					</li>
+					<% } %>
+					<% var i = (Number(currentPageNum) > 5 ? Number(currentPageNum) - 4 : 1) %>
+					<% if (i !== 1) { %>
+					<li class="page-item"><a class="page-link">...</a></li>
+					<% } %>
+					<% for (; i <= (Number(currentPageNum) + 4) && i <= numPages; i++) { %>
+					<% if (i == currentPageNum) { %>
+					<li class="page-item active"><a class="page-link"><%= i %></a></li>
+					<% } else { %>
+					<li class="page-item"><a class="page-link"
+							href="/techProducts/<%= techProduct._id %>/reviews/?page=<%= i %>"><%= i %></a></li>
+					<% } %>
+					<% if (i == Number(currentPageNum) + 4 && i < numPages) { %>
+					<li class="page-item"><a class="page-link">...</a></li>
+					<% } %>
+					<% } %>
+					<% if (Number(currentPageNum) + 1 <= numPages) { %>
+					<li class="page-item"><a class="page-link"
+							href="/techProducts/<%= techProduct._id %>/reviews/?page=<%= Number(currentPageNum) + 1 %>"><i
+								class="fas fa-arrow-alt-circle-right"></i></a>
+					</li>
+					<% } %>
+				</ul>
+			</section>
+			<% } %>
+		</div>
+	</div>
+</div>
+<%- include("../partials/footer") %>

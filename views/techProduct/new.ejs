@@ -1,0 +1,38 @@
+<%- include("../partials/header") %>
+<div class="my-3">
+	<h1 class="text-center">Create a New Tech Product</h1>
+	<div class="my-4">
+		<form action="/techProducts" method="POST" enctype="multipart/form-data" autcomplete="off">
+			<div class="form-group row justify-content-center">
+				<div class="col-12 col-md-6 col-lg-5">
+					<label for="name">Name*</label>
+					<input type="text" id="name" class="form-control mb-2" name="techProduct[name]"
+						placeholder="dell xps 15" required>
+					<label for="description">Description*</label>
+					<textarea id="description" class="form-control mb-2" name="techProduct[description]"
+						placeholder="Smallest 15.6'' laptop with stunning OLED display." required></textarea>
+					<label for="category">Category*</label>
+					<select id="category" class="form-control mb-2" name="techProduct[category]">
+						<option selected value="laptops">Laptops</option>
+						<option value="phones">Phones</option>
+						<option value="gaming">Gaming</option>
+						<option value="tvs">TVs</option>
+						<option value="tablets">Tablets</option>
+						<option value="wearables">Wearables</option>
+						<option value="audio">Audio</option>
+					</select>
+					<label for="price">Price*</label>
+					<input type="number" id="price" class="form-control mb-4" name="techProduct[price]"
+						placeholder="1829.99" required min="0.01" step="0.01">
+					<div class="custom-file mb-3">
+						<input type="file" id="image" class="custom-file-input" name="image" required accept="image/*">
+						<label class="custom-file-label" for="image">Upload Picture of Tech Product*</label>
+					</div>
+					<button class="btn btn-primary btn-block mb-2">Create Tech Product</button>
+					<a href="/techProducts">Take Me Home</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<%- include("../partials/footer") %>

@@ -1,0 +1,26 @@
+<%- include("../partials/header") %>
+<div class="my-3">
+	<h1 class="text-center">New Review</h1>
+	<div class="my-4">
+		<form action="/techProducts/<%= techProduct._id %>/reviews" method="POST" autocomplete="off">
+			<div class="form-group row justify-content-center">
+				<div class="col-12 col-md-6 col-lg-5">
+					<label for="rating">Rating*</label>
+					<div>
+						<% for(var i = 0; i <= 5; i++){ %>
+						<label class="radio-inline mr-1"><input type="radio" name="review[rating]" value="<%= i %>"
+								required>
+							<%= i %></label>
+						<% } %>
+					</div>
+					<label for="comment">Comment*</label>
+					<textarea id="review" class="form-control mb-3" name="review[comment]"
+						placeholder="The OLED display is so good." required></textarea>
+					<button class="btn btn-primary btn-block mb-2">Add Review</button>
+					<a href="/techProducts/<%= techProduct._id %>/reviews">Go Back</a>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<%- include("../partials/footer") %>

@@ -1,0 +1,108 @@
+<%- include("../partials/header") %>
+<div class="jumbotron mt-3 mb-3 text-center">
+	<h1 class="display-4">Welcome to TECHnically A Review!</h1>
+	<p class="lead">Enjoy our wide collection of tech product reviews</p>
+	<a class="btn btn-primary btn-lg" href="/techProducts/new" role="button"><i class="fas fa-plus"></i>
+		Add New Tech Product</a>
+</div>
+<form action="/techProducts" method="GET">
+	<div class="row justify-content-center mt-4">
+		<div class="col-12 d-flex flex-column flex-md-row">
+			<input class="form-control" type="search" name="search" placeholder="search tech products by keyword(s)"
+				value="<%= searchQuery !== '' && searchQuery !== '' ? searchQuery : '' %>">
+			<button class="btn btn-success ml-0 ml-md-2 mt-2 mt-md-0 search-btn" title="search"><i
+					class="fas fa-search"></i></button>
+			<% if(searchQuery !== ""){ %>
+			<a href="/techProducts" class="btn btn-danger ml-0 ml-md-2 mt-2 mt-md-0 clear-search"><i
+					class="fas fa-times"></i>
+				Clear Search</a>
+			<% } %>
+		</div>
+	</div>
+</form>
+<% if (searchQuery !== "") { %>
+<p class="mt-2 mb-0 text-center text-md-right">
+	<strong>
+		<%= techProducts.length %>
+		<%= techProducts.length > 1 || techProducts.length === 0 ? 'results' : 'result' %>
+	</strong>
+</p>
+
+<div class="text-center">
+	<% categoriesWithCount.forEach((category) => { %>
+	<a href="/techProducts?search=<%= searchQuery %>&category=<%= category._id.category %>"><%= category._id.category %>
+		(<%= category.categoryCount %>)</a>
+	<% }); %>
+	<% if(categoryQuery !== ""){ %>
+	<p><i class="fas fa-filter"></i> Category: <%= categoryQuery %></p>
+	<% } %>
+</div>
+<p></p>
+<% } else { %>
+<p class="text-center mt-2"><strong>Total Tech Products: <%= techProducts.length %></strong></p>
+<% } %>
+<div class="row justify-content-between justify-content-lg-start text-center align-items-center">
+	<% techProducts.forEach(function(techProduct){ %>
+	<div class="col-sm-6 col-md-5 col-lg-4 mb-3 d-flex align-self-stretch justify-content-center techProduct-card-col">
+		<div class="card" id="<%= techProduct._id %>">
+			<img src="<%= techProduct.imageUrl %>" class="card-img-top techProduct-img">
+			<div class="card-body">
+				<h5 class="card-title"><%= techProduct.name %></h5>
+				<% for(var i = 1; i <= 5 && techProduct.reviews.length != 0; i++){ %>
+				<% if(i <= techProduct.avgRating){ %>
+				<i class="fas fa-star text-warning"></i>
+				<% }else{ %>
+				<i class="far fa-star"></i>
+				<% } %>
+				<% } %>
+				<div class="mt-2 mb-2">
+					<% if(techProduct.reviews.length){ %>
+					<span><%= techProduct.reviews.length %></span>
+					<i class="fas fa-comments ml-1"></i>
+					<% } else { %>
+					<h6 class="sub-heading">No Reviews Yet</h6>
+					<% } %>
+				</div>
+				<div class="badge badge-pill badge-secondary"><%= techProduct.category %></div>
+			</div>
+		</div>
+	</div>
+	<% }); %>
+</div>
+<% var numPages = Math.ceil(techProducts.length / 6) %>
+<% if (numPages > 0) { %>
+<div class="row justify-content-center mt-3">
+	<ul class="pagination">
+		<% if (Number(currentPageNum) - 1 > 0) { %>
+		<li class="page-item"><a class="page-link"
+				href="/techProducts/?page=<%= Number(currentPageNum) - 1 %><%= searchQuery !== '' ? '&search=' + searchQuery : '' %><%= categoryQuery !== '' ? '&category=' + categoryQuery : '' %>"><i
+					class="fas fa-arrow-alt-circle-left"></i></a>
+		</li>
+		<% } %>
+		<% var i = (Number(currentPageNum) > 5 ? Number(currentPageNum) - 4 : 1) %>
+		<% if (i !== 1) { %>
+		<li class="page-item"><a class="page-link">...</a></li>
+		<% } %>
+		<% for (; i <= (Number(currentPageNum) + 4) && i <= numPages; i++) { %>
+		<% if (i == currentPageNum) { %>
+		<li class="page-item active"><a class="page-link"><%= i %></a></li>
+		<% } else { %>
+		<li class="page-item"><a class="page-link"
+				href="/techProducts/?page=<%= i %><%= searchQuery !== '' ? '&search=' + searchQuery : '' %><%= categoryQuery !== '' ? '&category=' + categoryQuery : '' %>"><%= i %></a>
+		</li>
+		<% } %>
+		<% if (i == Number(currentPageNum) + 4 && i < numPages) { %>
+		<li class="page-item"><a class="page-link">...</a></li>
+		<% } %>
+		<% } %>
+		<% if (Number(currentPageNum) + 1 <= numPages) { %>
+		<li class="page-item"><a class="page-link"
+				href="/techProducts/?page=<%= Number(currentPageNum) + 1 %><%= searchQuery !== '' ? '&search=' + searchQuery : '' %><%= categoryQuery !== '' ? '&category=' + categoryQuery : '' %>"><i
+					class="fas fa-arrow-alt-circle-right"></i>
+			</a>
+		</li>
+		<% } %>
+	</ul>
+</div>
+<% } %>
+<%- include("../partials/footer") %>

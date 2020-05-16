@@ -1,0 +1,83 @@
+body {
+  background: #000;
+}
+
+h1 {
+  font-size: 3em;
+  color: #fff;
+  text-shadow: 2px 2px 10px black;
+}
+
+#landing-header {
+  z-index: 1;
+  position: relative;
+  text-align: center;
+  padding-top: 34vh;
+}
+
+.slideshow {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.slideshow li {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  z-index: 0;
+  animation: imageAnimation 50s linear infinite;
+}
+
+.slideshow li:nth-child(1) {
+  background-image: url(https://res.cloudinary.com/nodeproject/image/upload/v1589223076/macbook_zxolfa.jpg);
+}
+.slideshow li:nth-child(2) {
+  background-image: url(https://res.cloudinary.com/nodeproject/image/upload/v1589223074/watch_uebhcv.jpg);
+  animation-delay: 10s;
+}
+.slideshow li:nth-child(3) {
+  background-image: url(https://res.cloudinary.com/nodeproject/image/upload/v1589223072/devices_gzl14y.jpg);
+  animation-delay: 20s;
+}
+.slideshow li:nth-child(4) {
+  background-image: url(https://res.cloudinary.com/nodeproject/image/upload/v1589223069/surface_pro_k5h40e.jpg);
+  animation-delay: 30s;
+}
+.slideshow li:nth-child(5) {
+  background-image: url(https://res.cloudinary.com/nodeproject/image/upload/v1589223067/headphones_tlmuot.jpg);
+  animation-delay: 40s;
+}
+
+@keyframes imageAnimation {
+  0% {
+    opacity: 0;
+    animation-timing-function: ease-in;
+  }
+  10% {
+    opacity: 1;
+    animation-timing-function: ease-out;
+  }
+  20% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 0;
+  }
+}
+
+.no-cssanimations .slideshow li {
+  opacity: 1;
+}

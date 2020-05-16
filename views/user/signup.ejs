@@ -1,21 +1,48 @@
-<%- include("../partials/top") %>
+<%- include("../partials/header") %>
 <div class="my-3">
 	<h1 class="text-center">Sign Up</h1>
-	<div class="my-4">
-			<form action="/signup" method="POST">
+	<div class="text-center mt-3">
+		<a href="/auth/google" class="btn btn-danger mb-2"><i class="fab fa-google mr-2"></i>Sign Up With Google</a>
+		<p><strong>Or</strong></p>
+	</div>
+	<div class="my-2">
+		<hr>
+		<form action="/users" method="POST" enctype="multipart/form-data" autocomplete="off">
 			<div class="form-group row justify-content-center">
 				<div class="col-12 col-md-6 col-lg-5">
-					<input type="text" name="username" class="form-control mb-2" placeholder="username">
-					<input type="password" name="password" class="form-control mb-2" placeholder="password">
-					<input type="text" name="name" class="form-control mb-2" placeholder="full name">
-					<input type="email" name="email" class="form-control mb-2" placeholder="email">
-					<input type="text" name="avatar" class="form-control mb-2" placeholder="avatar url">
-					<input type="password" name="adminCode" class="form-control mb-2" placeholder="Admin Code">
-					<button class="btn btn-primary btn-block mb-2">Sign Up!</button>
-					<a href="/campgrounds">Go Back</a>
+					<label for="email">Email*</label>
+					<input type="email" id="email" class="form-control mb-2" name="newUser[email]"
+						placeholder="john@doe.com" required
+						pattern="^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,3})$">
+					<label for="password">Password*</label>
+					<div class="input-group mb-2">
+						<input type="password" id="password" class="form-control" name="newUser[password]"
+							placeholder="password" required pattern=".{8,}" title="8 characters minimum.">
+						<div class="input-group-append">
+							<a class="btn btn-secondary"><i class="fas fa-eye-slash"></i></a>
+						</div>
+					</div>
+					<label for="fullName">Full Name*</label>
+					<input type="text" id="fullName" class="form-control mb-4" name="newUser[name]"
+						placeholder="John Doe" required>
+					<div class="custom-file mb-2">
+						<input type="file" id="avatar" class="custom-file-input" name="avatar" required
+							accept="image/*">
+						<label class="custom-file-label" for="avatar">Upload Profile Picture*</label>
+					</div>
+					<label for="code">Admin Code</label>
+					<div class="input-group mb-2">
+						<input type="password" id="password" class="form-control" name="newUser[code]"
+							placeholder="admin code">
+						<div class="input-group-append">
+							<a class="btn btn-secondary"><i class="fas fa-eye-slash"></i></a>
+						</div>
+					</div>
+					<button class="btn btn-primary btn-block mb-2">Sign Up</button>
+					<span>Already have an account? <a href="/login">Login</a></span>
 				</div>
 			</div>
 		</form>
 	</div>
 </div>
-<%- include("../partials/bottom") %>
+<%- include("../partials/footer") %>
