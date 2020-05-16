@@ -9,7 +9,7 @@ function requestNotificationPermission() {
 }
 
 function pusherInit() {
-  const pusher = new Pusher("c627e88e08f0797f495c", {
+  const pusher = new Pusher("49ce1b345dea889b9c97", {
     cluster: "us2"
   });
   const channel = pusher.subscribe("notifications");
