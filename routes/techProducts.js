@@ -16,6 +16,7 @@ router.get("/", async (req, res) => {
   var page = Number(req.query.page) || 1;
   var categoriesWithCount = [];
   var numTechProducts;
+  const totalTechProducts = await TechProduct.find({}).countDocuments();
   try {
     if (searchQuery) {
       const nameRegex = new RegExp(helper.escapeRegex(req.query.search), "gi");
@@ -55,7 +56,8 @@ router.get("/", async (req, res) => {
       currentPageNum: page,
       searchQuery,
       categoriesWithCount,
-      categoryQuery
+      categoryQuery,
+      totalTechProducts
     });
   } catch (e) {
     res.redirect("/");
