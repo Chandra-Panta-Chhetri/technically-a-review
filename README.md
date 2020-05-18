@@ -9,14 +9,14 @@ A RESTful tech product reviewing website with CRUD functionality where users can
 
 ## What app looks like
 
-![Landing page](pictures/landing_page.png)
+![Landing page](pictures/landing_page.png "Landing page")
 ![Login page](pictures/login_page.png "Login page")
 ![Home page](pictures/home_page.png "Home page")
 ![Tech product show page](pictures/show_page.png "Tech product show page")
 ![Home page when user uses search bar](pictures/searching.png "Home page when user uses search bar")
 ![Home page when user filters by category](pictures/category_filtering.png "Home page when user filters by category")
 ![Real-time notification](pictures/notification.png "Real-time notification")
-![Responsive home page](pictures/responsive_home.jpg)
+![Responsive home page](pictures/responsive_home.jpg "Home page on mobile device")
 
 ## Features
 
