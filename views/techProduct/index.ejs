@@ -69,7 +69,7 @@
 	</div>
 	<% }); %>
 </div>
-<% var numPages = Math.ceil(totalTechProducts / 6) %>
+<% var numPages = searchQuery === '' ? Math.ceil(totalTechProducts / 6) : Math.ceil(techProducts.length / 6) %>
 <% if (numPages > 0) { %>
 <div class="row justify-content-center mt-3">
 	<ul class="pagination">
