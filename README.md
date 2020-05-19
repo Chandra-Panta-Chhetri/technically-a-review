@@ -21,8 +21,8 @@ A RESTful tech product reviewing website with CRUD functionality where users can
 ## Features
 
 - Sign up & login using Google account or by creating a regular account (email & password)
-- Create tech products for others to review
-- Review other's tech products
+- Create, edit, delete tech products
+- Review tech products once, edit or delete review
 - See reviews for all tech products
 - Search for tech products using the search bar (fuzzy searching) on the home
   - Fuzzy searching searches by finding tech products that match a pattern approximately (rather than exactly).
