@@ -32,7 +32,7 @@ A RESTful tech product reviewing website with CRUD functionality where users can
 - Change password (only for non-Google accounts), change profile picture, delete account
 - Reset password through the Forgot Password Flow
   - After entering email of forgotten account, users will recieve email with a one-time reset password link that expires in 15 mins
-- Recieve real-time notifications anytime someone updates, deletes, creates a review or tech products
+- Real-time notifications anytime a user updates, deletes, writes a new review or creates a new tech product post
 
 ## Dependencies
 
