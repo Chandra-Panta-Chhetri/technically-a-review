@@ -14,12 +14,20 @@ const flash = require("connect-flash");
 const cookieSession = require("cookie-session");
 const passport = require("passport");
 
-mongoose.connect(process.env.DBURL, {
-  useNewUrlParser: true,
-  useFindAndModify: false,
-  useCreateIndex: true,
-  useUnifiedTopology: true
-});
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.DBURL, {
+      useNewUrlParser: true,
+      useFindAndModify: false,
+      useCreateIndex: true,
+      useUnifiedTopology: true
+    });
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.log(error);
+    process.exit(1);
+  }
+};
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(`${__dirname}/public`));
@@ -53,6 +61,8 @@ app.get("*", function (req, res) {
   res.render("error404", { pageName: "404" });
 });
 
-app.listen(process.env.PORT, process.env.IP, () => {
-  console.log("Server Online...");
+connectDB().then(() => {
+  app.listen(process.env.PORT, process.env.IP, () => {
+    console.log("Server Online...");
+  });
 });
