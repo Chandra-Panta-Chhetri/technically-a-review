@@ -1,4 +1,3 @@
-require("dotenv").config();
 require("./routes/configs/passportLocalConfig");
 require("./routes/configs/passportGoogleConfig");
 const express = require("express");
