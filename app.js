@@ -12,7 +12,6 @@ const methodOverride = require("method-override");
 const flash = require("connect-flash");
 const cookieSession = require("cookie-session");
 const passport = require("passport");
-const enforce = require("express-sslify");
 
 const connectDB = async () => {
   try {
@@ -29,9 +28,6 @@ const connectDB = async () => {
   }
 };
 
-if (process.env.NODE_ENV === "production") {
-  app.use(enforce.HTTPS({ trustProtoHeader: true }));
-}
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(`${__dirname}/public`));
 app.use(flash());
