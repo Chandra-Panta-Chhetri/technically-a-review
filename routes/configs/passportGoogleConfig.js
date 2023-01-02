@@ -9,7 +9,8 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: process.env.GOOGLE_CALLBACK_URL
+      callbackURL: process.env.GOOGLE_CALLBACK_URL,
+      proxy: true
     },
     async (accessToken, refreshToken, profile, done) => {
       var user = await User.findOne({ googleId: profile.id });
@@ -20,13 +21,10 @@ passport.use(
           email: profile.emails[0].value,
           name: profile.displayName
         };
-        const result = await cloudinary.uploader.upload(
-          profile.photos[0].value,
-          {
-            public_id: newUser._id,
-            eager: [{ width: 350, height: 250, crop: "scale", quality: "100" }]
-          }
-        );
+        const result = await cloudinary.uploader.upload(profile.photos[0].value, {
+          public_id: newUser._id,
+          eager: [{ width: 350, height: 250, crop: "scale", quality: "100" }]
+        });
         newUser.avatarUrl = result.eager[0].secure_url;
         user = await User.create(newUser);
       }
